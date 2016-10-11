@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.input.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<Menu fx:id="menuTools" text="_Tools" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.sourceforge.tessboxeditor.MenuToolsController">
+    <items>
+        <MenuItem fx:id="miMergeTIFF" onAction="#handleAction" text="Merge _TIFF...">
+         <accelerator>
+            <KeyCodeCombination alt="UP" code="M" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
+         </accelerator></MenuItem>
+        <MenuItem fx:id="miSplitTIFF" onAction="#handleAction" text="_Split TIFF...">
+         <accelerator>
+            <KeyCodeCombination alt="UP" code="L" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
+         </accelerator></MenuItem>
+    </items>
+</Menu>

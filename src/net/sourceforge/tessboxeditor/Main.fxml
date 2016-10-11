@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.layout.BorderPane?>
+
+<BorderPane prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.sourceforge.tessboxeditor.MainController">
+    <center>
+        <TabPane fx:id="tabPane" prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER">
+            <tabs>
+                <Tab text="Trainer">
+                    <content>
+                        <fx:include fx:id="tabTrainer" source="Trainer.fxml" />
+                    </content>
+                </Tab>
+                <Tab text="Box Editor">
+                    <content>
+                        <fx:include fx:id="tabBoxEditor" source="BoxEditor.fxml" />
+                    </content>
+                </Tab>
+                <Tab text="TIFF/Box Generator">
+                    <content>
+                        <fx:include fx:id="tabGenerator" source="ImageGenerator.fxml" />
+                    </content>
+                </Tab>
+            </tabs>
+        </TabPane>
+    </center>
+    <top>
+        <fx:include fx:id="menuBar" source="MainMenu.fxml" />
+    </top>
+</BorderPane>

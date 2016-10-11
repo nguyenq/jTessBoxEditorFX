@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.SeparatorMenuItem?>
+<?import javafx.scene.input.KeyCodeCombination?>
+<?import javafx.scene.layout.BorderPane?>
+
+<MenuBar fx:id="menuBar" BorderPane.alignment="CENTER" xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.sourceforge.tessboxeditor.MainMenuController">
+    <menus>
+        <Menu onAction="#handleAction" text="_File">
+            <items>
+                <MenuItem fx:id="miOpen" onAction="#handleAction" text="_Open...">
+                    <accelerator>
+                        <KeyCodeCombination alt="UP" code="O" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
+                    </accelerator>
+                </MenuItem>
+                <MenuItem fx:id="miSave" onAction="#handleAction" text="_Save">
+                    <accelerator>
+                        <KeyCodeCombination alt="UP" code="S" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
+                    </accelerator>
+                </MenuItem>
+                <MenuItem fx:id="miSaveAs" onAction="#handleAction" text="Save _As...">
+                    <accelerator>
+                        <KeyCodeCombination alt="UP" code="S" control="DOWN" meta="UP" shift="DOWN" shortcut="UP" />
+                    </accelerator>
+                </MenuItem>
+                <SeparatorMenuItem fx:id="separatorRecentFiles" />
+                <fx:include fx:id="menuRecentFiles" source="MenuRecentFiles.fxml" />
+                <SeparatorMenuItem fx:id="separatorExit" />
+                <MenuItem fx:id="miExit" onAction="#handleAction" text="E_xit" />
+            </items>
+        </Menu>
+        <Menu fx:id="menuEdit" onAction="#handleAction" text="_Edit">
+            <items>
+                <MenuItem fx:id="miMerge" onAction="#handleAction" text="_Merge">
+                    <accelerator>
+                        <KeyCodeCombination alt="UP" code="C" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
+                    </accelerator>
+                </MenuItem>
+                <MenuItem fx:id="miSplit" onAction="#handleAction" text="_Split">
+                    <accelerator>
+                        <KeyCodeCombination alt="UP" code="X" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
+                    </accelerator>
+                </MenuItem>
+                <MenuItem fx:id="miInsert" onAction="#handleAction" text="_Insert">
+                    <accelerator>
+                        <KeyCodeCombination alt="UP" code="V" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
+                    </accelerator>
+                </MenuItem>
+                <MenuItem fx:id="miDelete" onAction="#handleAction" text="_Delete">
+                    <accelerator>
+                        <KeyCodeCombination alt="UP" code="DELETE" control="UP" meta="UP" shift="UP" shortcut="UP" />
+                    </accelerator>
+                </MenuItem>
+            </items>
+        </Menu>
+        <Menu fx:id="menuSettings" onAction="#handleAction" text="_Settings">
+            <items>
+                <MenuItem fx:id="miFont" onAction="#handleAction" text="_Font...">
+                    <accelerator>
+                        <KeyCodeCombination alt="UP" code="T" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
+                    </accelerator>
+                </MenuItem>
+            </items>
+        </Menu>
+        <fx:include fx:id="menuTools" source="MenuTools.fxml" />
+        <Menu onAction="#handleAction" text="_Help">
+            <items>
+                <MenuItem fx:id="miHelp" onAction="#handleAction" text="jTessBoxEditorFX _Help" />
+                <SeparatorMenuItem />
+                <MenuItem fx:id="miAbout" onAction="#handleAction" text="_About jTessBoxEditorFX" />
+            </items>
+        </Menu>
+    </menus>
+</MenuBar>

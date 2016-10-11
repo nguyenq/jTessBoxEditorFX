@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ProgressBar?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToolBar?>
+<?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+
+<BorderPane prefWidth="1000.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.sourceforge.tessboxeditor.TrainerValidatorController">
+    <top>
+        <ToolBar prefHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+            <items>
+                <Label text="Tesseract Executables" />
+                <TextField fx:id="tfTessDir" editable="false">
+                    <tooltip>
+                        <Tooltip text="Location of Tesseract Executables" />
+                    </tooltip>
+                </TextField>
+                <Button fx:id="btnBrowseTess" mnemonicParsing="false" onAction="#handleAction" text="...">
+                    <tooltip>
+                        <Tooltip text="Browse" />
+                    </tooltip>
+                </Button>
+                <Label text="Training Data" />
+                <TextField fx:id="tfDataDir" editable="false">
+                    <tooltip>
+                        <Tooltip text="Location of Source Training Data" />
+                    </tooltip>
+                </TextField>
+                <Button fx:id="btnBrowseData" mnemonicParsing="false" onAction="#handleAction" text="...">
+                    <tooltip>
+                        <Tooltip text="Browse" />
+                    </tooltip>
+                </Button>
+                <Label text="Language" />
+                <TextField fx:id="tfLang" prefWidth="50.0" />
+                <Label text="Bootstrap Language" />
+                <TextField fx:id="tfBootstrapLang" prefWidth="40.0" />
+                <CheckBox fx:id="chbRTL" mnemonicParsing="false" text="RTL">
+                    <tooltip>
+                        <Tooltip text="Right-To-Left Text Direction" />
+                    </tooltip>
+                </CheckBox>
+                <ComboBox fx:id="cbOps" prefWidth="205.0">
+                    <tooltip>
+                        <Tooltip text="Training Mode" />
+                    </tooltip>
+                </ComboBox>
+                <Button fx:id="btnTrain" mnemonicParsing="false" onAction="#handleAction" text="Run">
+                    <tooltip>
+                        <Tooltip text="Start Training" />
+                    </tooltip>
+                </Button>
+                <Button fx:id="btnCancel" disable="true" mnemonicParsing="false" onAction="#handleAction" text="Cancel">
+                    <tooltip>
+                        <Tooltip text="Cancel Training" />
+                    </tooltip>
+                </Button>
+                <Button fx:id="btnValidate" mnemonicParsing="false" onAction="#handleAction" text="Validate">
+                    <tooltip>
+                        <Tooltip text="Validate Generated Traineddata" />
+                    </tooltip>
+                </Button>
+                <Button fx:id="btnSaveLog" mnemonicParsing="false" onAction="#handleAction" text="Save">
+                    <tooltip>
+                        <Tooltip text="Save Log" />
+                    </tooltip>
+                </Button>
+                <Button fx:id="btnClearLog" mnemonicParsing="false" onAction="#handleAction" text="Clear">
+                    <tooltip>
+                        <Tooltip text="Clear Textaera" />
+                    </tooltip>
+                </Button>
+            </items>
+        </ToolBar>
+    </top>
+    <center>
+        <TextArea fx:id="taOutput" editable="false" prefHeight="146.0" prefWidth="320.0" BorderPane.alignment="CENTER" />
+    </center>
+    <bottom>
+        <HBox prefHeight="20.0" prefWidth="200.0" spacing="5.0">
+            <children>
+                <ProgressBar fx:id="progressBar1" prefWidth="200.0" progress="0.0" visible="false" />
+                <Label fx:id="labelStatus" />
+            </children>
+            <padding>
+                <Insets left="10.0" />
+            </padding>
+        </HBox>
+    </bottom>
+</BorderPane>

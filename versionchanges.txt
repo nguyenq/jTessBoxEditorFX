@@ -1,8 +1,8 @@
 jTessBoxEditorFX Change Summary
 
-Version 2.0 RC (17 September 2016):
+Version 2.0 RC (19 December 2016):
 - Rewrite using JavaFX to address the issue of rendering complex scripts in Java Swing
-- Upgrade Tesseract training executable 3.05dev (from https://github.com/UB-Mannheim/tesseract/wiki)
+- Upgrade Tesseract training executable 3.05dev (2016-11-11) (from https://github.com/UB-Mannheim/tesseract/wiki)
 - Generated images are now compressed to reduce file size and save storage space
 - Additional parameters for text2image command
 - Use BreakIterator for character boundary analysis

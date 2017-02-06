@@ -85,6 +85,8 @@ public class MainMenuController implements Initializable {
     @FXML
     private MenuItem miDelete;
     @FXML
+    private MenuItem miMarkEOL;
+    @FXML
     private Menu menuSettings;
     @FXML
     private MenuItem miFont;
@@ -154,6 +156,8 @@ public class MainMenuController implements Initializable {
             ((Button) menuBar.getScene().lookup("#btnInsert")).fire();
         } else if (event.getSource() == miDelete) {
             ((Button) menuBar.getScene().lookup("#btnDelete")).fire();
+        } else if (event.getSource() == miMarkEOL) {
+            ((Button) menuBar.getScene().lookup("#btnMarkEOL")).fire();
         } else if (event.getSource() == miFont) {
             FontSelectorDialog dialog = new FontSelectorDialog(font);
             Optional<Font> op = dialog.showAndWait();

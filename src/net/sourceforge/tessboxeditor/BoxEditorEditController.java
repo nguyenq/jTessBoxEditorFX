@@ -15,16 +15,25 @@
  */
 package net.sourceforge.tessboxeditor;
 
+import java.awt.Rectangle;
+import java.awt.image.BufferedImage;
 import java.util.List;
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.TextField;
+import net.sourceforge.tess4j.ITessAPI;
+import net.sourceforge.tess4j.ITesseract;
+import net.sourceforge.tess4j.Tesseract;
 import net.sourceforge.tessboxeditor.datamodel.TessBox;
+import net.sourceforge.tessboxeditor.datamodel.TessBoxCollection;
 
 public class BoxEditorEditController extends BoxEditorController {
+
     @FXML
     private Button btnMerge;
     @FXML
@@ -33,10 +42,14 @@ public class BoxEditorEditController extends BoxEditorController {
     private Button btnInsert;
     @FXML
     private Button btnDelete;
-    
+    @FXML
+    private Button btnMarkEOL;
+
+    private OcrSegmentWorker ocrSegmentWorker;
+
     /**
      * Event handler.
-     * 
+     *
      * @param event
      */
     @FXML
@@ -50,11 +63,13 @@ public class BoxEditorEditController extends BoxEditorController {
             insertAction(event);
         } else if (event.getSource() == btnDelete) {
             deleteAction(event);
+        } else if (event.getSource() == btnMarkEOL) {
+            markEOLAction(event);
         } else {
             super.handleAction(event);
         }
     }
-    
+
     void mergeAction(ActionEvent evt) {
         if (boxes == null) {
             return;
@@ -129,7 +144,7 @@ public class BoxEditorEditController extends BoxEditorController {
             h /= 2;
             //tableModel.setValueAt(String.valueOf(h), index, 4);
         }
-        
+
         // reduce size of 1st box
         box.setRect(new Rectangle2D(rect.getMinX(), rect.getMinY(), w, h));
 
@@ -184,13 +199,82 @@ public class BoxEditorEditController extends BoxEditorController {
             alert.show();
             return;
         }
-        
+
         this.tableView.getSelectionModel().clearSelection();
         for (TessBox box : selected) {
             this.boxes.remove(box);
         }
-        
+
         resetReadout();
         this.imageCanvas.paint();
+    }
+
+    void markEOLAction(ActionEvent evt) {
+        this.tableView.getScene().setCursor(javafx.scene.Cursor.WAIT);
+        this.imageCanvas.setCursor(javafx.scene.Cursor.WAIT);
+
+        // instantiate task for OCR
+        ocrSegmentWorker = new OcrSegmentWorker(imageList);
+        new Thread(ocrSegmentWorker).start();
+    }
+
+    /**
+     * A worker class for managing OCR process.
+     */
+    class OcrSegmentWorker extends Task<Void> {
+
+        List<BufferedImage> imageList;
+
+        public OcrSegmentWorker(List<BufferedImage> imageList) {
+            this.imageList = imageList;
+        }
+
+        @Override
+        protected Void call() throws Exception {
+            ITesseract instance = new Tesseract();
+            String tessDirectory = ((TextField) btnMarkEOL.getScene().lookup("#tfTessDir")).getText();
+            instance.setDatapath(tessDirectory);
+
+            short pageIndex = 0;
+            for (BufferedImage image : imageList) {
+                // Perform text-line segmentation
+                List<Rectangle> regions = instance.getSegmentedRegions(image, ITessAPI.TessPageIteratorLevel.RIL_TEXTLINE);
+                TessBoxCollection boxesPerPage = boxPages.get(pageIndex); // boxes per page
+                for (Rectangle rect : regions) { // process each line
+                    Rectangle2D rect2d = new Rectangle2D(rect.getMinX(), rect.getMinY(), rect.getWidth(), rect.getHeight());
+                    TessBox lastBox = boxesPerPage.toList().stream().filter((r) -> {
+                        return rect2d.contains(r.getRect());
+                    }).reduce((first, second) -> second).orElse(null);
+
+                    if (lastBox == null) {
+                        continue;
+                    }
+
+                    int index = boxesPerPage.toList().indexOf(lastBox);
+                    Rectangle2D rect2 = lastBox.getRect();
+                    Rectangle2D nRect = new Rectangle2D(rect2.getMaxX() + 10, rect2.getMinY(), rect2.getWidth(), rect2.getHeight());
+                    boxesPerPage.add(index + 1, new TessBox("\t", nRect, pageIndex));
+                }
+                pageIndex++;
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void succeeded() {
+            super.succeeded();
+            resetReadout();
+            loadTable();
+            tableView.getScene().setCursor(javafx.scene.Cursor.DEFAULT);
+            imageCanvas.setCursor(javafx.scene.Cursor.DEFAULT);
+        }
+
+        @Override
+        protected void failed() {
+            super.failed();
+            tableView.getScene().setCursor(javafx.scene.Cursor.DEFAULT);
+            imageCanvas.setCursor(javafx.scene.Cursor.DEFAULT);
+        }
     }
 }

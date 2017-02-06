@@ -164,11 +164,11 @@ public class BoxEditorController implements Initializable {
 
     private File boxFile;
     private String currentDirectory, outputDirectory;
-    private List<TessBoxCollection> boxPages;
+    protected List<TessBoxCollection> boxPages;
     protected TessBoxCollection boxes; // boxes of current page
     private short imageIndex;
     private int filterIndex;
-    private List<BufferedImage> imageList;
+    protected List<BufferedImage> imageList;
     private boolean isTess2_0Format;
     private BooleanProperty boxChangedProp;
     protected boolean tableSelectAction;

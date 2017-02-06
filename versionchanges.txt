@@ -6,3 +6,6 @@ Version 1.0 (06 January 2017):
 - Generated images are now compressed to reduce file size and save storage space
 - Additional parameters for text2image command
 - Use BreakIterator for character boundary analysis
+
+Version 2.0 Beta (05 February 2017):
+- Implement Mark EOL with Tab character

@@ -67,6 +67,11 @@
                         <Tooltip text="Delete Box(es)" />
                     </tooltip>
                 </Button>
+                <Button fx:id="btnMarkEOL" mnemonicParsing="false" onAction="#handleAction" text="Mark EOL">
+                    <tooltip>
+                        <Tooltip text="Mark EOL with Tab character" />
+                    </tooltip>
+                </Button>
                 <Region fx:id="rgn2" />
                 <Label fx:id="labelCharacter" text="Character" />
                 <TextField fx:id="tfCharacter" onAction="#handleAction" prefWidth="50.0" />

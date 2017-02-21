@@ -41,6 +41,7 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.scene.text.Font;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
+import net.sourceforge.tessboxeditor.utilities.Utils;
 
 public class TrainerController implements Initializable {
 
@@ -184,8 +185,15 @@ public class TrainerController implements Initializable {
         // make sure all required data files exist before training
         if (selectedMode == TrainingMode.Train_with_Existing_Box || selectedMode == TrainingMode.Dictionary || selectedMode == TrainingMode.Train_from_Scratch) {
             final String lang = tfLang.getText();
-            boolean otherFilesExist = new File(trainDataDirectory, lang + ".font_properties").exists() && new File(trainDataDirectory, lang + ".frequent_words_list").exists() && new File(trainDataDirectory, lang + ".words_list").exists();
 
+            File font_propertiesFile = new File(trainDataDirectory, lang + ".font_properties");
+            Utils.createFile(font_propertiesFile);
+            File frequent_words_listFile = new File(trainDataDirectory, lang + ".frequent_words_list");
+            Utils.createFile(frequent_words_listFile);
+            File words_listFile = new File(trainDataDirectory, lang + ".words_list");
+            Utils.createFile(words_listFile);
+
+            boolean otherFilesExist = font_propertiesFile.exists() && frequent_words_listFile.exists() && words_listFile.exists();
             if (!otherFilesExist) {
                 msg = String.format("The required file %1$s.font_properties, %1$s.frequent_words_list, or %1$s.words_list does not exist.", lang);
                 new Alert(Alert.AlertType.NONE, msg, ButtonType.OK).showAndWait();
@@ -342,7 +350,7 @@ public class TrainerController implements Initializable {
     void validate() {
         // to be implemented in subclass
     }
-    
+
     void setFont(Font font) {
         this.taOutput.setFont(font);
     }

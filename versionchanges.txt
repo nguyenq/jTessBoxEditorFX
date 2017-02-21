@@ -6,3 +6,6 @@ Version 1.0 (06 January 2017):
 - Generated images are now compressed to reduce file size and save storage space
 - Additional parameters for text2image command
 - Use BreakIterator for character boundary analysis
+
+Version 1.0.1 (21 February 2017)
+- Create stub empty files for font_properties, frequent_words_list, and words_list, as needed

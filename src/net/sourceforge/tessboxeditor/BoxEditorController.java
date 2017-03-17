@@ -177,6 +177,7 @@ public class BoxEditorController implements Initializable {
     final String[] headers = {"Char", "X", "Y", "Width", "Height"};
 
     ObservableList<ExtensionFilter> fileFilters; //extensionFilters
+    FileChooser fc;
 
     protected static int iconMargin = 3;
     protected static int scaleFactor = 4;
@@ -216,6 +217,18 @@ public class BoxEditorController implements Initializable {
         btnSave.disableProperty().bind(boxChangedProp.not());
 
         bundle = ResourceBundle.getBundle("net.sourceforge.tessboxeditor.Gui"); // NOI18N
+        fc = new FileChooser();
+        fc.setTitle("Open Image File");
+        ExtensionFilter allImageFilter = new ExtensionFilter(bundle.getString("All_Image_Files"), "*.bmp", "*.jpg", "*.jpeg", "*.png", "*.tif", "*.tiff");
+        ExtensionFilter pngFilter = new ExtensionFilter("PNG", "*.png");
+        ExtensionFilter tiffFilter = new ExtensionFilter("TIFF", "*.tif", "*.tiff");
+
+        fileFilters = fc.getExtensionFilters();
+        fileFilters.addAll(allImageFilter, pngFilter, tiffFilter);
+        if (filterIndex < fileFilters.size()) {
+            fc.setSelectedExtensionFilter(fileFilters.get(filterIndex));
+        }
+
         HBox.setHgrow(rgn2, Priority.ALWAYS);
         HBox.setHgrow(rgn3, Priority.ALWAYS);
 
@@ -435,19 +448,7 @@ public class BoxEditorController implements Initializable {
     @FXML
     protected void handleAction(ActionEvent event) {
         if (event.getSource() == btnOpen) {
-            FileChooser fc = new FileChooser();
-            fc.setTitle("Open Image File");
             fc.setInitialDirectory(new File(currentDirectory));
-            ExtensionFilter allImageFilter = new ExtensionFilter(bundle.getString("All_Image_Files"), "*.bmp", "*.jpg", "*.jpeg", "*.png", "*.tif", "*.tiff");
-            ExtensionFilter pngFilter = new ExtensionFilter("PNG", "*.png");
-            ExtensionFilter tiffFilter = new ExtensionFilter("TIFF", "*.tif", "*.tiff");
-
-            fileFilters = fc.getExtensionFilters();
-            fileFilters.addAll(allImageFilter, pngFilter, tiffFilter);
-            if (filterIndex < fileFilters.size()) {
-                fc.setSelectedExtensionFilter(fileFilters.get(filterIndex));
-            }
-
             File file = fc.showOpenDialog(btnOpen.getScene().getWindow());
             if (file != null) {
                 currentDirectory = file.getParent();

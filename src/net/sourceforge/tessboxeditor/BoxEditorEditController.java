@@ -31,7 +31,6 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.TextField;
-import javafx.stage.FileChooser;
 import net.sourceforge.tess4j.ITessAPI;
 import net.sourceforge.tess4j.ITesseract;
 import net.sourceforge.tess4j.Tesseract;
@@ -230,8 +229,7 @@ public class BoxEditorEditController extends BoxEditorController {
         new Thread(ocrSegmentWorker).start();
     }
 
-    void markEOLActionBulk(ActionEvent evt) {
-        FileChooser fc = new FileChooser();
+    void markEOLActionBulk(ActionEvent evt) {           
         List<File> files = fc.showOpenMultipleDialog(btnMarkEOLBulk.getScene().getWindow());
         if (files != null) {
             this.tableView.getScene().setCursor(javafx.scene.Cursor.WAIT);

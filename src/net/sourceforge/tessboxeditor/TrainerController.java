@@ -22,6 +22,7 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Optional;
@@ -149,7 +150,7 @@ public class TrainerController implements Initializable {
 
             try {
                 File outFile = new File(trainDataDirectory, "training.log");
-                try (BufferedWriter out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outFile), "UTF8"))) {
+                try (BufferedWriter out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outFile), StandardCharsets.UTF_8))) {
                     out.write(taOutput.getText());
                 }
 

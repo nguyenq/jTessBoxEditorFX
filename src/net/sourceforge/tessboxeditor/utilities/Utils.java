@@ -56,6 +56,7 @@ public class Utils {
                     }
                 }
             } else {
+                fontpropFile.getParentFile().mkdirs();
                 fontpropFile.createNewFile();
             }
 

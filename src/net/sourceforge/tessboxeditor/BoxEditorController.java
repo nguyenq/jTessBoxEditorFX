@@ -174,7 +174,6 @@ public class BoxEditorController implements Initializable {
     private BooleanProperty boxChangedProp;
     protected boolean tableSelectAction;
     static final String EOL = System.getProperty("line.separator");
-    static final String UTF8 = "UTF-8";
     final String[] headers = {"Char", "X", "Y", "Width", "Height"};
 
     ObservableList<ExtensionFilter> fileFilters; //extensionFilters
@@ -848,7 +847,7 @@ public class BoxEditorController implements Initializable {
 
     boolean saveBoxFile() {
         try {
-            try (BufferedWriter out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(boxFile), UTF8))) {
+            try (BufferedWriter out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(boxFile), StandardCharsets.UTF_8))) {
                 out.write(formatOutputString(imageList, boxPages));
             }
             boxChangedProp.set(false);
@@ -868,11 +867,11 @@ public class BoxEditorController implements Initializable {
 
     String formatOutputString(List<BufferedImage> imageList, List<TessBoxCollection> boxPages) {
         StringBuilder sb = new StringBuilder();
-        for (short i = 0; i < imageList.size(); i++) {
-            int pageHeight = ((BufferedImage) imageList.get(i)).getHeight(); // each page (in an image) can have different height
-            for (TessBox box : boxPages.get(i).toList()) {
+        for (short pageIndex = 0; pageIndex < imageList.size(); pageIndex++) {
+            int pageHeight = ((BufferedImage) imageList.get(pageIndex)).getHeight(); // each page (in an image) can have different height
+            for (TessBox box : boxPages.get(pageIndex).toList()) {
                 Rectangle2D rect = box.getRect();
-                sb.append(String.format("%s %.0f %.0f %.0f %.0f %d", box.getCharacter(), rect.getMinX(), pageHeight - rect.getMinY() - rect.getHeight(), rect.getMinX() + rect.getWidth(), pageHeight - rect.getMinY(), i)).append(EOL);
+                sb.append(String.format("%s %.0f %.0f %.0f %.0f %d", box.getCharacter(), rect.getMinX(), pageHeight - rect.getMinY() - rect.getHeight(), rect.getMinX() + rect.getWidth(), pageHeight - rect.getMinY(), pageIndex)).append(EOL);
             }
         }
         if (isTess2_0Format) {

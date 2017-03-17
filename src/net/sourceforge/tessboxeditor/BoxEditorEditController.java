@@ -21,6 +21,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
@@ -310,7 +311,7 @@ public class BoxEditorEditController extends BoxEditorController {
                 performSegment(imageList, boxPages, instance);
 
                 // save boxes
-                try (BufferedWriter out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(boxFile), UTF8))) {
+                try (BufferedWriter out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(boxFile), StandardCharsets.UTF_8))) {
                     out.write(formatOutputString(imageList, boxPages));
                 }
             }

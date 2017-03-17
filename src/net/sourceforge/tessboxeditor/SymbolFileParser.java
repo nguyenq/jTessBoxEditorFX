@@ -19,6 +19,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import net.sourceforge.vietocr.util.Utils;
@@ -52,8 +53,7 @@ public class SymbolFileParser {
             if (!symbolFile.exists()) {
                 return null;
             }
-            try (BufferedReader in = new BufferedReader(new InputStreamReader(
-                    new FileInputStream(symbolFile), "UTF8"))) {
+            try (BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(symbolFile), StandardCharsets.UTF_8))) {
                 while ((str = in.readLine()) != null) {
                     // strip BOM character
                     if (str.length() > 0 && str.charAt(0) == '\ufeff') {

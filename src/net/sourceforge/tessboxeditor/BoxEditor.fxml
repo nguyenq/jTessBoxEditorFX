@@ -27,7 +27,7 @@
 <?import javafx.scene.shape.Rectangle?>
 <?import net.sourceforge.tessboxeditor.control.*?>
 
-<BorderPane prefHeight="600.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.sourceforge.tessboxeditor.BoxEditorKeyEventController">
+<BorderPane prefHeight="600.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.sourceforge.tessboxeditor.BoxEditorKeyEventController">
     <top>
         <ToolBar prefHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER">
             <items>
@@ -67,10 +67,9 @@
                         <Tooltip text="Delete Box(es)" />
                     </tooltip>
                 </Button>
-                <Button fx:id="btnMarkEOL" mnemonicParsing="false" onAction="#handleAction" text="Mark EOL">
-                    <tooltip>
-                        <Tooltip text="Mark EOL with Tab character" />
-                    </tooltip>
+                <Button fx:id="btnMarkEOL" mnemonicParsing="false" onAction="#handleAction" text="Mark EOL" visible="false">
+                </Button>
+                <Button fx:id="btnMarkEOLBulk" mnemonicParsing="false" onAction="#handleAction" text="Mark EOL Bulk" visible="false">
                 </Button>
                 <Region fx:id="rgn2" />
                 <Label fx:id="labelCharacter" text="Character" />

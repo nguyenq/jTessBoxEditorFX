@@ -481,7 +481,7 @@ public class ImageGeneratorController implements Initializable {
                 }
                 outputbase = outputDirectory + "/" + prefix + outputbase;
                 trainer.text2image(inputTextFile.getPath(), outputbase, fontGen, tfFontFolder.getText(), (int) this.spnExposure.getValue(), this.spnTracking.getValue().floatValue(), this.spnLeading.getValue(), (int) this.spnW.getValue(), (int) this.spnH.getValue());
-                Utils.removeEmptyBoxes(new File(outputbase + ".box"));
+//                Utils.removeEmptyBoxes(new File(outputbase + ".box"));
             } else {
                 // make box
                 if (tabPane.getSelectionModel().getSelectedIndex() == 0) {

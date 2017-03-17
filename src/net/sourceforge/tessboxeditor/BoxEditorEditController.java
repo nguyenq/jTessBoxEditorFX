@@ -17,6 +17,10 @@ package net.sourceforge.tessboxeditor;
 
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStreamWriter;
 import java.util.List;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
@@ -26,9 +30,11 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.TextField;
+import javafx.stage.FileChooser;
 import net.sourceforge.tess4j.ITessAPI;
 import net.sourceforge.tess4j.ITesseract;
 import net.sourceforge.tess4j.Tesseract;
+import net.sourceforge.tess4j.util.ImageIOHelper;
 import net.sourceforge.tessboxeditor.datamodel.TessBox;
 import net.sourceforge.tessboxeditor.datamodel.TessBoxCollection;
 
@@ -44,8 +50,11 @@ public class BoxEditorEditController extends BoxEditorController {
     private Button btnDelete;
     @FXML
     private Button btnMarkEOL;
+    @FXML
+    private Button btnMarkEOLBulk;
 
     private OcrSegmentWorker ocrSegmentWorker;
+    private OcrSegmentBulkWorker ocrSegmentBulkWorker;
 
     /**
      * Event handler.
@@ -65,6 +74,8 @@ public class BoxEditorEditController extends BoxEditorController {
             deleteAction(event);
         } else if (event.getSource() == btnMarkEOL) {
             markEOLAction(event);
+        } else if (event.getSource() == btnMarkEOLBulk) {
+            markEOLActionBulk(event);
         } else {
             super.handleAction(event);
         }
@@ -214,8 +225,21 @@ public class BoxEditorEditController extends BoxEditorController {
         this.imageCanvas.setCursor(javafx.scene.Cursor.WAIT);
 
         // instantiate task for OCR
-        ocrSegmentWorker = new OcrSegmentWorker(imageList);
+        ocrSegmentWorker = new OcrSegmentWorker(imageList, boxPages);
         new Thread(ocrSegmentWorker).start();
+    }
+
+    void markEOLActionBulk(ActionEvent evt) {
+        FileChooser fc = new FileChooser();
+        List<File> files = fc.showOpenMultipleDialog(btnMarkEOLBulk.getScene().getWindow());
+        if (files != null) {
+            this.tableView.getScene().setCursor(javafx.scene.Cursor.WAIT);
+            this.imageCanvas.setCursor(javafx.scene.Cursor.WAIT);
+
+            // instantiate task for OCR
+            ocrSegmentBulkWorker = new OcrSegmentBulkWorker(files);
+            new Thread(ocrSegmentBulkWorker).start();
+        }
     }
 
     /**
@@ -224,9 +248,11 @@ public class BoxEditorEditController extends BoxEditorController {
     class OcrSegmentWorker extends Task<Void> {
 
         List<BufferedImage> imageList;
+        List<TessBoxCollection> boxPages;
 
-        public OcrSegmentWorker(List<BufferedImage> imageList) {
+        public OcrSegmentWorker(List<BufferedImage> imageList, List<TessBoxCollection> boxPages) {
             this.imageList = imageList;
+            this.boxPages = boxPages;
         }
 
         @Override
@@ -234,30 +260,7 @@ public class BoxEditorEditController extends BoxEditorController {
             ITesseract instance = new Tesseract();
             String tessDirectory = ((TextField) btnMarkEOL.getScene().lookup("#tfTessDir")).getText();
             instance.setDatapath(tessDirectory);
-
-            short pageIndex = 0;
-            for (BufferedImage image : imageList) {
-                // Perform text-line segmentation
-                List<Rectangle> regions = instance.getSegmentedRegions(image, ITessAPI.TessPageIteratorLevel.RIL_TEXTLINE);
-                TessBoxCollection boxesPerPage = boxPages.get(pageIndex); // boxes per page
-                for (Rectangle rect : regions) { // process each line
-                    Rectangle2D rect2d = new Rectangle2D(rect.getMinX(), rect.getMinY(), rect.getWidth(), rect.getHeight());
-                    TessBox lastBox = boxesPerPage.toList().stream().filter((r) -> {
-                        return rect2d.contains(r.getRect());
-                    }).reduce((first, second) -> second).orElse(null);
-
-                    if (lastBox == null) {
-                        continue;
-                    }
-
-                    int index = boxesPerPage.toList().indexOf(lastBox);
-                    Rectangle2D rect2 = lastBox.getRect();
-                    Rectangle2D nRect = new Rectangle2D(rect2.getMaxX() + 10, rect2.getMinY(), rect2.getWidth(), rect2.getHeight());
-                    boxesPerPage.add(index + 1, new TessBox("\t", nRect, pageIndex));
-                }
-                pageIndex++;
-            }
-
+            performSegment(imageList, boxPages, instance);
             return null;
         }
 
@@ -275,6 +278,86 @@ public class BoxEditorEditController extends BoxEditorController {
             super.failed();
             tableView.getScene().setCursor(javafx.scene.Cursor.DEFAULT);
             imageCanvas.setCursor(javafx.scene.Cursor.DEFAULT);
+        }
+    }
+
+    /**
+     * A worker class for managing OCR process.
+     */
+    class OcrSegmentBulkWorker extends Task<Void> {
+
+        List<File> files;
+
+        public OcrSegmentBulkWorker(List<File> files) {
+            this.files = files;
+        }
+
+        @Override
+        protected Void call() throws Exception {
+            ITesseract instance = new Tesseract();
+            String tessDirectory = ((TextField) btnMarkEOL.getScene().lookup("#tfTessDir")).getText();
+            instance.setDatapath(tessDirectory);
+            for (File imageFile : files) {
+                int lastDot = imageFile.getName().lastIndexOf(".");
+                File boxFile = new File(imageFile.getParentFile(), imageFile.getName().substring(0, lastDot) + ".box");
+                if (!boxFile.exists()) {
+                    continue;
+                }
+
+                List<BufferedImage> imageList = ImageIOHelper.getImageList(imageFile);
+                String str = readBoxFile(boxFile);
+                List<TessBoxCollection> boxPages = parseBoxString(str, imageList);
+                performSegment(imageList, boxPages, instance);
+
+                // save boxes
+                try (BufferedWriter out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(boxFile), UTF8))) {
+                    out.write(formatOutputString(imageList, boxPages));
+                }
+            }
+            return null;
+        }
+
+        @Override
+        protected void succeeded() {
+            super.succeeded();
+            Alert alert = new Alert(Alert.AlertType.INFORMATION, "EOL tab characters have been inserted in selected box files.");
+            alert.setTitle(JTessBoxEditor.APP_NAME);
+            alert.setHeaderText(null);
+            alert.showAndWait();
+            tableView.getScene().setCursor(javafx.scene.Cursor.DEFAULT);
+            imageCanvas.setCursor(javafx.scene.Cursor.DEFAULT);
+        }
+
+        @Override
+        protected void failed() {
+            super.failed();
+            tableView.getScene().setCursor(javafx.scene.Cursor.DEFAULT);
+            imageCanvas.setCursor(javafx.scene.Cursor.DEFAULT);
+        }
+    }
+
+    void performSegment(final List<BufferedImage> imageList, final List<TessBoxCollection> boxPages, final ITesseract instance) throws Exception {
+        short pageIndex = 0;
+        for (BufferedImage image : imageList) {
+            // Perform text-line segmentation
+            List<Rectangle> regions = instance.getSegmentedRegions(image, ITessAPI.TessPageIteratorLevel.RIL_TEXTLINE);
+            TessBoxCollection boxesPerPage = boxPages.get(pageIndex); // boxes per page
+            for (Rectangle rect : regions) { // process each line
+                Rectangle2D rect2d = new Rectangle2D(rect.getMinX(), rect.getMinY(), rect.getWidth(), rect.getHeight());
+                TessBox lastBox = boxesPerPage.toList().stream().filter((r) -> {
+                    return rect2d.contains(r.getRect());
+                }).reduce((first, second) -> second).orElse(null);
+
+                if (lastBox == null) {
+                    continue;
+                }
+
+                int index = boxesPerPage.toList().indexOf(lastBox);
+                Rectangle2D rect2 = lastBox.getRect();
+                Rectangle2D nRect = new Rectangle2D(rect2.getMaxX() + 10, rect2.getMinY(), rect2.getWidth(), rect2.getHeight());
+                boxesPerPage.add(index + 1, new TessBox("\t", nRect, pageIndex));
+            }
+            pageIndex++;
         }
     }
 }

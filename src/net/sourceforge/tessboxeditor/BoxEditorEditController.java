@@ -245,21 +245,19 @@ public class BoxEditorEditController extends BoxEditorController {
 
             this.tableView.getScene().setCursor(javafx.scene.Cursor.WAIT);
             this.imageCanvas.setCursor(javafx.scene.Cursor.WAIT);
-            ProgressMonitor pForm = new ProgressMonitor();
+
             // instantiate task for OCR
             ocrSegmentBulkWorker = new OcrSegmentBulkWorker(files);
-
+            ProgressMonitor progressMonitor = new ProgressMonitor(ocrSegmentBulkWorker);
             ocrSegmentBulkWorker.setOnSucceeded(event -> {
-                pForm.getDialogStage().close();
+                progressMonitor.getDialogStage().close();
 //                miMarkEOLBulk.setDisable(false);
             });
 
             new Thread(ocrSegmentBulkWorker).start();
 //            miMarkEOLBulk.setDisable(true);
 
-            // binds progress of progress bars to progress of task:
-            pForm.bindProperties(ocrSegmentBulkWorker);
-            pForm.getDialogStage().show();
+            progressMonitor.getDialogStage().show();
         }
     }
 
@@ -323,6 +321,11 @@ public class BoxEditorEditController extends BoxEditorController {
 
             int tick = (int) Math.ceil(100f / files.size());
             for (File imageFile : files) {
+                if (isCancelled()) {
+                    updateMessage("Cancelled");
+                    break;
+                }
+
                 int lastDot = imageFile.getName().lastIndexOf(".");
                 File boxFile = new File(imageFile.getParentFile(), imageFile.getName().substring(0, lastDot) + ".box");
                 if (!boxFile.exists()) {
@@ -353,6 +356,14 @@ public class BoxEditorEditController extends BoxEditorController {
             alert.setTitle(JTessBoxEditor.APP_NAME);
             alert.setHeaderText(null);
             alert.showAndWait();
+            tableView.getScene().setCursor(javafx.scene.Cursor.DEFAULT);
+            imageCanvas.setCursor(javafx.scene.Cursor.DEFAULT);
+        }
+
+        @Override
+        protected void cancelled() {
+            super.cancelled();
+            updateMessage("Cancelled!");
             tableView.getScene().setCursor(javafx.scene.Cursor.DEFAULT);
             imageCanvas.setCursor(javafx.scene.Cursor.DEFAULT);
         }
@@ -396,32 +407,37 @@ public class BoxEditorEditController extends BoxEditorController {
         private ProgressBar pb;
         Label labelHeading;
         Label labelStatus;
+        Button cancelButton;
+        Task<?> task;
 
-        public ProgressMonitor() {
+        public ProgressMonitor(Task<?> task) {
+            this.task = task;
             dialogStage = new Stage();
             dialogStage.setTitle("Progress...");
             dialogStage.initStyle(StageStyle.UTILITY);
             dialogStage.setResizable(false);
             dialogStage.initModality(Modality.APPLICATION_MODAL);
 
-            // PROGRESS BAR
-            labelHeading = new Label("Mark EOL with tab...");
+            labelHeading = new Label("Marking EOL with tab...");
             labelStatus = new Label();
             pb = new ProgressBar();
             pb.setProgress(0);
+            cancelButton = new Button("Cancel");
+            cancelButton.setOnAction((ActionEvent event) -> {
+                task.cancel();
+                dialogStage.close();
+            });
+
+            pb.progressProperty().bind(task.progressProperty());
+            labelStatus.textProperty().bind(task.messageProperty());
 
             final VBox vb = new VBox();
             vb.setSpacing(5);
             vb.setPadding(new Insets(20, 20, 20, 20));
-            vb.getChildren().addAll(labelHeading, labelStatus, pb);
+            vb.getChildren().addAll(labelHeading, labelStatus, pb, cancelButton);
 
             Scene scene = new Scene(vb);
             dialogStage.setScene(scene);
-        }
-
-        public void bindProperties(final Task<?> task) {
-            pb.progressProperty().bind(task.progressProperty());
-            labelStatus.textProperty().bind(task.messageProperty());
         }
 
         public Stage getDialogStage() {

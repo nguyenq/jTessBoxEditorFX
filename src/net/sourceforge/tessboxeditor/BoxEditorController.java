@@ -164,7 +164,7 @@ public class BoxEditorController implements Initializable {
     final Preferences prefs = MainController.prefs;
 
     private File boxFile;
-    private String currentDirectory, outputDirectory;
+    protected String currentDirectory, outputDirectory;
     protected List<TessBoxCollection> boxPages;
     protected TessBoxCollection boxes; // boxes of current page
     private short imageIndex;

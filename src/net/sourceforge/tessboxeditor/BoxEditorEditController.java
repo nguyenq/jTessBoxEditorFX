@@ -26,11 +26,19 @@ import java.util.List;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.geometry.Insets;
 import javafx.geometry.Rectangle2D;
+import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.Label;
+import javafx.scene.control.ProgressBar;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.VBox;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import net.sourceforge.tess4j.ITessAPI;
 import net.sourceforge.tess4j.ITesseract;
 import net.sourceforge.tess4j.Tesseract;
@@ -229,15 +237,29 @@ public class BoxEditorEditController extends BoxEditorController {
         new Thread(ocrSegmentWorker).start();
     }
 
-    void markEOLActionBulk(ActionEvent evt) {           
+    void markEOLActionBulk(ActionEvent evt) {
+        fc.setInitialDirectory(new File(currentDirectory));
         List<File> files = fc.showOpenMultipleDialog(btnMarkEOLBulk.getScene().getWindow());
         if (files != null) {
+            currentDirectory = files.get(0).getParent();
+
             this.tableView.getScene().setCursor(javafx.scene.Cursor.WAIT);
             this.imageCanvas.setCursor(javafx.scene.Cursor.WAIT);
-
+            ProgressMonitor pForm = new ProgressMonitor();
             // instantiate task for OCR
             ocrSegmentBulkWorker = new OcrSegmentBulkWorker(files);
+
+            ocrSegmentBulkWorker.setOnSucceeded(event -> {
+                pForm.getDialogStage().close();
+//                miMarkEOLBulk.setDisable(false);
+            });
+
             new Thread(ocrSegmentBulkWorker).start();
+//            miMarkEOLBulk.setDisable(true);
+
+            // binds progress of progress bars to progress of task:
+            pForm.bindProperties(ocrSegmentBulkWorker);
+            pForm.getDialogStage().show();
         }
     }
 
@@ -293,9 +315,13 @@ public class BoxEditorEditController extends BoxEditorController {
 
         @Override
         protected Void call() throws Exception {
+            int progress = 0;
+            updateProgress(0, 100);
             ITesseract instance = new Tesseract();
             String tessDirectory = ((TextField) btnMarkEOL.getScene().lookup("#tfTessDir")).getText();
             instance.setDatapath(tessDirectory);
+
+            int tick = (int) Math.ceil(100f / files.size());
             for (File imageFile : files) {
                 int lastDot = imageFile.getName().lastIndexOf(".");
                 File boxFile = new File(imageFile.getParentFile(), imageFile.getName().substring(0, lastDot) + ".box");
@@ -312,6 +338,10 @@ public class BoxEditorEditController extends BoxEditorController {
                 try (BufferedWriter out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(boxFile), StandardCharsets.UTF_8))) {
                     out.write(formatOutputString(imageList, boxPages));
                 }
+
+                progress += tick;
+                updateProgress(Math.min(progress, 100), 100);
+                updateMessage(imageFile.getName());
             }
             return null;
         }
@@ -357,6 +387,45 @@ public class BoxEditorEditController extends BoxEditorController {
                 boxesPerPage.add(index + 1, new TessBox("\t", nRect, pageIndex));
             }
             pageIndex++;
+        }
+    }
+
+    public class ProgressMonitor {
+
+        private final Stage dialogStage;
+        private ProgressBar pb;
+        Label labelHeading;
+        Label labelStatus;
+
+        public ProgressMonitor() {
+            dialogStage = new Stage();
+            dialogStage.setTitle("Progress...");
+            dialogStage.initStyle(StageStyle.UTILITY);
+            dialogStage.setResizable(false);
+            dialogStage.initModality(Modality.APPLICATION_MODAL);
+
+            // PROGRESS BAR
+            labelHeading = new Label("Mark EOL with tab...");
+            labelStatus = new Label();
+            pb = new ProgressBar();
+            pb.setProgress(0);
+
+            final VBox vb = new VBox();
+            vb.setSpacing(5);
+            vb.setPadding(new Insets(20, 20, 20, 20));
+            vb.getChildren().addAll(labelHeading, labelStatus, pb);
+
+            Scene scene = new Scene(vb);
+            dialogStage.setScene(scene);
+        }
+
+        public void bindProperties(final Task<?> task) {
+            pb.progressProperty().bind(task.progressProperty());
+            labelStatus.textProperty().bind(task.messageProperty());
+        }
+
+        public Stage getDialogStage() {
+            return dialogStage;
         }
     }
 }

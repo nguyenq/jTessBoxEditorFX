@@ -27,6 +27,7 @@ import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
@@ -35,6 +36,7 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -249,6 +251,7 @@ public class BoxEditorEditController extends BoxEditorController {
             // instantiate task for OCR
             ocrSegmentBulkWorker = new OcrSegmentBulkWorker(files);
             ProgressMonitor progressMonitor = new ProgressMonitor(ocrSegmentBulkWorker);
+            progressMonitor.setTitle(JTessBoxEditor.APP_NAME);
             ocrSegmentBulkWorker.setOnSucceeded(event -> {
                 progressMonitor.getDialogStage().close();
 //                miMarkEOLBulk.setDisable(false);
@@ -408,10 +411,8 @@ public class BoxEditorEditController extends BoxEditorController {
         Label labelHeading;
         Label labelStatus;
         Button cancelButton;
-        Task<?> task;
 
         public ProgressMonitor(Task<?> task) {
-            this.task = task;
             dialogStage = new Stage();
             dialogStage.setTitle("Progress...");
             dialogStage.initStyle(StageStyle.UTILITY);
@@ -421,6 +422,7 @@ public class BoxEditorEditController extends BoxEditorController {
             labelHeading = new Label("Marking EOL with tab...");
             labelStatus = new Label();
             pb = new ProgressBar();
+            pb.setPrefWidth(260);
             pb.setProgress(0);
             cancelButton = new Button("Cancel");
             cancelButton.setOnAction((ActionEvent event) -> {
@@ -430,11 +432,16 @@ public class BoxEditorEditController extends BoxEditorController {
 
             pb.progressProperty().bind(task.progressProperty());
             labelStatus.textProperty().bind(task.messageProperty());
+            
+            final HBox hb = new HBox();
+            hb.setAlignment(Pos.CENTER);
+            hb.setPadding(new Insets(10, 0, 0, 0));
+            hb.getChildren().add(cancelButton);
 
             final VBox vb = new VBox();
             vb.setSpacing(5);
             vb.setPadding(new Insets(20, 20, 20, 20));
-            vb.getChildren().addAll(labelHeading, labelStatus, pb, cancelButton);
+            vb.getChildren().addAll(labelHeading, labelStatus, pb, hb);
 
             Scene scene = new Scene(vb);
             dialogStage.setScene(scene);
@@ -442,6 +449,10 @@ public class BoxEditorEditController extends BoxEditorController {
 
         public Stage getDialogStage() {
             return dialogStage;
+        }
+        
+        public void setTitle(String title) {
+            dialogStage.setTitle(title);
         }
     }
 }

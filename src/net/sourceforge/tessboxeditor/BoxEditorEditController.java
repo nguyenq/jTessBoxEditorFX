@@ -204,7 +204,7 @@ public class BoxEditorEditController extends BoxEditorController {
         int index = this.boxes.toList().indexOf(box);
         index++;
         // offset the new box 15 pixel from the base one
-        TessBox newBox = new TessBox(box.getCharacter(), new Rectangle2D(box.getX() + 15, box.getY(), box.getWidth(), box.getHeight()), box.getPage());
+        TessBox newBox = new TessBox(" ", new Rectangle2D(box.getX() + 15, box.getY(), box.getWidth(), box.getHeight()), box.getPage());
         boxes.add(index, newBox);
         tableView.getSelectionModel().clearAndSelect(index);
         this.imageCanvas.paint();

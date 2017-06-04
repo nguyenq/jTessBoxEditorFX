@@ -25,6 +25,7 @@ import java.io.OutputStreamWriter;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -173,7 +174,6 @@ public class BoxEditorController implements Initializable {
     private BooleanProperty boxChangedProp;
     protected boolean tableSelectAction;
     static final String EOL = System.getProperty("line.separator");
-    static final String UTF8 = "UTF-8";
     final String[] headers = {"Char", "X", "Y", "Width", "Height"};
 
     ObservableList<ExtensionFilter> fileFilters; //extensionFilters
@@ -469,7 +469,7 @@ public class BoxEditorController implements Initializable {
 
                     @Override
                     protected Void call() throws Exception {
-                        readBoxFile(boxFile);
+                        loadBoxes(boxFile);
                         return null;
                     }
 
@@ -626,7 +626,7 @@ public class BoxEditorController implements Initializable {
                 readImageFile(selectedFile);
                 int lastDot = selectedFile.getName().lastIndexOf(".");
                 boxFile = new File(selectedFile.getParentFile(), selectedFile.getName().substring(0, lastDot) + ".box");
-                readBoxFile(boxFile);
+                loadBoxes(boxFile);
                 return null;
             }
         };
@@ -661,57 +661,14 @@ public class BoxEditorController implements Initializable {
         }
     }
 
-    void readBoxFile(final File boxFile) {
+    void loadBoxes(File boxFile) {
         if (boxFile.exists()) {
             try {
                 boxPages.clear();
 
                 // load into textarea first
-                String content = new String(Files.readAllBytes(boxFile.toPath()), StandardCharsets.UTF_8);
-
-                // load into coordinate tab
-                String[] boxdata = content.split("\\n");
-                if (boxdata.length > 0) {
-                    // if only 5 fields, it's Tess 2.0x format
-                    isTess2_0Format = boxdata[0].split("\\s+").length == 5;
-                }
-
-                int startBoxIndex = 0;
-
-                for (int curPage = 0; curPage < imageList.size(); curPage++) {
-                    TessBoxCollection boxCol = new TessBoxCollection();
-                    // Note that the coordinate system used in the box file has (0,0) at the bottom-left.
-                    // On computer graphics device, (0,0) is defined as top-left.
-                    int pageHeight = imageList.get(curPage).getHeight();
-                    for (int i = startBoxIndex; i < boxdata.length; i++) {
-                        String[] items = boxdata[i].split("\\s+");
-
-                        // skip invalid data
-                        if (items.length < 5 || items.length > 6) {
-                            continue;
-                        }
-
-                        String chrs = items[0];
-                        int x = Integer.parseInt(items[1]);
-                        int y = Integer.parseInt(items[2]);
-                        int w = Integer.parseInt(items[3]) - x;
-                        int h = Integer.parseInt(items[4]) - y;
-                        y = pageHeight - y - h; // flip the y-coordinate
-
-                        short page;
-                        if (items.length == 6) {
-                            page = Short.parseShort(items[5]); // Tess 3.0x format
-                        } else {
-                            page = 0; // Tess 2.0x format
-                        }
-                        if (page > curPage) {
-                            startBoxIndex = i; // mark begin of next page
-                            break;
-                        }
-                        boxCol.add(new TessBox(chrs, new Rectangle2D(x, y, w, h), page));
-                    }
-                    boxPages.add(boxCol); // add the last page
-                }
+                String content = readBoxFile(boxFile);
+                boxPages = parseBoxString(content, imageList);
 
                 Platform.runLater(() -> {
                     this.taBoxData.setText(content);
@@ -735,6 +692,59 @@ public class BoxEditorController implements Initializable {
             imageCanvas.setTable(null);
             imageCanvas.paint();
         }
+    }
+
+    String readBoxFile(File boxFile) throws IOException {
+        return new String(Files.readAllBytes(Paths.get(boxFile.getPath())), StandardCharsets.UTF_8);
+    }
+
+    List<TessBoxCollection> parseBoxString(String boxStr, List<BufferedImage> imageList) throws IOException {
+        List<TessBoxCollection> allBoxPages = new ArrayList<TessBoxCollection>();
+
+        String[] boxdata = boxStr.split("\\R"); // or "\\r?\\n"
+        if (boxdata.length > 0) {
+            // if only 5 fields, it's Tess 2.0x format
+            isTess2_0Format = boxdata[0].split("\\s+").length == 5;
+        }
+
+        int startBoxIndex = 0;
+
+        for (int curPage = 0; curPage < imageList.size(); curPage++) {
+            TessBoxCollection boxCol = new TessBoxCollection();
+            // Note that the coordinate system used in the box file has (0,0) at the bottom-left.
+            // On computer graphics device, (0,0) is defined as top-left.
+            int pageHeight = imageList.get(curPage).getHeight();
+            for (int i = startBoxIndex; i < boxdata.length; i++) {
+                String[] items = boxdata[i].split("(?<!^) +");
+
+                // skip invalid data
+                if (items.length < 5 || items.length > 6) {
+                    continue;
+                }
+
+                String chrs = items[0];
+                int x = Integer.parseInt(items[1]);
+                int y = Integer.parseInt(items[2]);
+                int w = Integer.parseInt(items[3]) - x;
+                int h = Integer.parseInt(items[4]) - y;
+                y = pageHeight - y - h; // flip the y-coordinate
+
+                short page;
+                if (items.length == 6) {
+                    page = Short.parseShort(items[5]); // Tess 3.0x format
+                } else {
+                    page = 0; // Tess 2.0x format
+                }
+                if (page > curPage) {
+                    startBoxIndex = i; // mark begin of next page
+                    break;
+                }
+                boxCol.add(new TessBox(chrs, new Rectangle2D(x, y, w, h), page));
+            }
+            allBoxPages.add(boxCol); // add the last page
+        }
+
+        return allBoxPages;
     }
 
     /**
@@ -837,8 +847,8 @@ public class BoxEditorController implements Initializable {
 
     boolean saveBoxFile() {
         try {
-            try (BufferedWriter out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(boxFile), UTF8))) {
-                out.write(formatOutputString());
+            try (BufferedWriter out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(boxFile), StandardCharsets.UTF_8))) {
+                out.write(formatOutputString(imageList, boxPages));
             }
             boxChangedProp.set(false);
         } catch (OutOfMemoryError oome) {
@@ -855,13 +865,13 @@ public class BoxEditorController implements Initializable {
         return true;
     }
 
-    String formatOutputString() {
+    String formatOutputString(List<BufferedImage> imageList, List<TessBoxCollection> boxPages) {
         StringBuilder sb = new StringBuilder();
-        for (short i = 0; i < imageList.size(); i++) {
-            int pageHeight = ((BufferedImage) imageList.get(i)).getHeight(); // each page (in an image) can have different height
-            for (TessBox box : boxPages.get(i).toList()) {
+        for (short pageIndex = 0; pageIndex < imageList.size(); pageIndex++) {
+            int pageHeight = ((BufferedImage) imageList.get(pageIndex)).getHeight(); // each page (in an image) can have different height
+            for (TessBox box : boxPages.get(pageIndex).toList()) {
                 Rectangle2D rect = box.getRect();
-                sb.append(String.format("%s %.0f %.0f %.0f %.0f %d", box.getCharacter(), rect.getMinX(), pageHeight - rect.getMinY() - rect.getHeight(), rect.getMinX() + rect.getWidth(), pageHeight - rect.getMinY(), i)).append(EOL);
+                sb.append(String.format("%s %.0f %.0f %.0f %.0f %d", box.getCharacter(), rect.getMinX(), pageHeight - rect.getMinY() - rect.getHeight(), rect.getMinX() + rect.getWidth(), pageHeight - rect.getMinY(), pageIndex)).append(EOL);
             }
         }
         if (isTess2_0Format) {

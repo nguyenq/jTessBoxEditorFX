@@ -19,6 +19,7 @@ import java.awt.Graphics2D;
 import java.awt.font.TextAttribute;
 import java.awt.image.BufferedImage;
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -98,14 +99,14 @@ public class TiffBoxGeneratorFX {
     private String formatOutputString() {
         StringBuilder sb = new StringBuilder();
 //        String combiningSymbols = readCombiningSymbols();
-        for (short i = 0; i < imagePages.size(); i++) {
-            TessBoxCollection boxCol = boxPages.get(i);
+        for (short pageIndex = 0; pageIndex < imagePages.size(); pageIndex++) {
+            TessBoxCollection boxCol = boxPages.get(pageIndex);
 //            boxCol.setCombiningSymbols(combiningSymbols);
 //            boxCol.combineBoxes();
 
             for (TessBox box : boxCol.toList()) {
                 Rectangle2D rect = box.getRect();
-                sb.append(String.format("%s %.0f %.0f %.0f %.0f %d", box.getCharacter(), rect.getMinX(), height - rect.getMinY() - rect.getHeight(), rect.getMinX() + rect.getWidth(), height - rect.getMinY(), i)).append(EOL);
+                sb.append(String.format("%s %.0f %.0f %.0f %.0f %d", box.getCharacter(), rect.getMinX(), height - rect.getMinY() - rect.getHeight(), rect.getMinX() + rect.getWidth(), height - rect.getMinY(), pageIndex)).append(EOL);
             }
         }
 //        if (isTess2_0Format) {
@@ -210,7 +211,7 @@ public class TiffBoxGeneratorFX {
      */
     private void saveBoxFile() {
         try {
-            try (BufferedWriter out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(outputFolder, fileName + ".box")), "UTF8"))) {
+            try (BufferedWriter out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(outputFolder, fileName + ".box")), StandardCharsets.UTF_8))) {
                 out.write(formatOutputString());
             }
         } catch (Exception e) {

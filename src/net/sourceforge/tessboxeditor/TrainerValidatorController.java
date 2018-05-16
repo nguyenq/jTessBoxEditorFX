@@ -135,7 +135,7 @@ public class TrainerValidatorController extends TrainerController {
         protected String call() throws Exception {
             updateMessage(bundle.getString("OCR_running..."));
             OCR<File> ocrEngine = new OCRFiles(tessDirectory);
-            ocrEngine.setDatapath(trainDataDirectory);
+            ocrEngine.setDatapath(trainDataDirectory + "/tessdata");
             ocrEngine.setLanguage(language);
             String result = "";
             for (int i = 0; i < files.size(); i++) {

@@ -281,7 +281,8 @@ public class BoxEditorEditController extends BoxEditorController {
         protected Void call() throws Exception {
             ITesseract instance = new Tesseract();
             String tessDirectory = ((TextField) btnMarkEOL.getScene().lookup("#tfTessDir")).getText();
-            instance.setDatapath(tessDirectory + "/tessdata");
+            String tessdataPath = MainController.WINDOWS ? tessDirectory + "/tessdata" : "/usr/share/tesseract-ocr/4.00/tessdata";
+            instance.setDatapath(tessdataPath);
             performSegment(imageList, boxPages, instance);
             return null;
         }
@@ -320,7 +321,8 @@ public class BoxEditorEditController extends BoxEditorController {
             updateProgress(0, 100);
             ITesseract instance = new Tesseract();
             String tessDirectory = ((TextField) btnMarkEOL.getScene().lookup("#tfTessDir")).getText();
-            instance.setDatapath(tessDirectory + "/tessdata");
+            String tessdataPath = MainController.WINDOWS ? tessDirectory + "/tessdata" : "/usr/share/tesseract-ocr/4.00/tessdata";
+            instance.setDatapath(tessdataPath);
 
             int tick = (int) Math.ceil(100f / files.size());
             for (File imageFile : files) {
@@ -432,7 +434,7 @@ public class BoxEditorEditController extends BoxEditorController {
 
             pb.progressProperty().bind(task.progressProperty());
             labelStatus.textProperty().bind(task.messageProperty());
-            
+
             final HBox hb = new HBox();
             hb.setAlignment(Pos.CENTER);
             hb.setPadding(new Insets(10, 0, 0, 0));
@@ -450,7 +452,7 @@ public class BoxEditorEditController extends BoxEditorController {
         public Stage getDialogStage() {
             return dialogStage;
         }
-        
+
         public void setTitle(String title) {
             dialogStage.setTitle(title);
         }

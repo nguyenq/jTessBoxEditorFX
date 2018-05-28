@@ -801,7 +801,7 @@ public class BoxEditorController implements Initializable {
         if (boxFile == null || !boxFile.exists()) {
             return saveFileDlg();
         } else {
-            return saveBoxFile();
+            return saveBoxFile(boxFile);
         }
     }
 
@@ -810,8 +810,7 @@ public class BoxEditorController implements Initializable {
         fc.setTitle(bundle.getString("Save_As"));
         fc.setInitialDirectory(new File(outputDirectory));
         ExtensionFilter boxFilter = new ExtensionFilter("Box Files", "*.box");
-        ExtensionFilter allFilter = new ExtensionFilter("All Files", "*.*");
-        fc.getExtensionFilters().addAll(boxFilter, allFilter);
+        fc.getExtensionFilters().addAll(boxFilter);
 
         if (boxFile != null) {
             fc.setInitialDirectory(boxFile.getParentFile());
@@ -821,34 +820,16 @@ public class BoxEditorController implements Initializable {
         File f = fc.showSaveDialog(btnSave.getScene().getWindow());
         if (f != null) {
             outputDirectory = f.getParent();
-            if (fc.getSelectedExtensionFilter() == boxFilter) {
-                if (!f.getName().endsWith(".box")) {
-                    f = new File(f.getPath() + ".box");
-                }
-                if (boxFile != null && boxFile.getPath().equals(f.getPath())) {
-                    Alert alert = new Alert(AlertType.CONFIRMATION);
-                    alert.setTitle(bundle.getString("Confirm_Save_As"));
-                    alert.setContentText(boxFile.getName() + bundle.getString("file_already_exist"));
-
-                    Optional<ButtonType> result = alert.showAndWait();
-                    if (result.get() != ButtonType.OK) {
-                        return false;
-                    }
-                } else {
-                    boxFile = f;
-                }
-            } else {
-                boxFile = f;
-            }
-            return saveBoxFile();
+            boxFile = f;
+            return saveBoxFile(boxFile);
         } else {
             return false;
         }
     }
 
-    boolean saveBoxFile() {
+    boolean saveBoxFile(File file) {
         try {
-            try (BufferedWriter out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(boxFile), StandardCharsets.UTF_8))) {
+            try (BufferedWriter out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8))) {
                 out.write(formatOutputString(imageList, boxPages));
             }
             boxChangedProp.set(false);

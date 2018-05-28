@@ -14,3 +14,6 @@ Version 1.0.2 (4 June 2017)
 - Upgrade Tesseract training executable 3.05.01
 - Insert with a space
 - Fix reading box file containing space characters
+
+Version 1.0.3 (28 May 2018)
+- Update dependencies for Java 9 fixes

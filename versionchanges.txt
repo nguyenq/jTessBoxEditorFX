@@ -23,4 +23,4 @@ Version 1.1.0 (1 July 2018)
 
 Version 1.1.1 (25 July 2018)
 - Fix NPE in Java 10
-- Display severe exceptions
+- Fix "I/O error writing TIFF file!" when add noise

@@ -81,7 +81,7 @@ public class TiffBoxGeneratorFX {
         textFlow.setLineSpacing(leading + 4); // adjustment
     }
 
-    public void create() {
+    public void create() throws IOException {
         this.layoutPages();
         this.saveMultipageTiff();
         this.saveBoxFile();
@@ -311,7 +311,7 @@ public class TiffBoxGeneratorFX {
     /**
      * Creates a multi-page TIFF image.
      */
-    private void saveMultipageTiff() {
+    private void saveMultipageTiff() throws IOException {
         try {
             File tiffFile = new File(outputFolder, fileName + ".tif");
             tiffFile.delete();
@@ -324,6 +324,7 @@ public class TiffBoxGeneratorFX {
             ImageIOHelper.mergeTiff(images, tiffFile, isAntiAliased ? "LZW" : "CCITT T.6");  // CCITT T.6 for bitonal; LZW for others);
         } catch (Exception e) {
             logger.log(Level.SEVERE, e.getMessage(), e);
+            throw e;
         }
     }
 

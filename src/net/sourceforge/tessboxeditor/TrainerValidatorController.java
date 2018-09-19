@@ -190,6 +190,8 @@ public class TrainerValidatorController extends TrainerController {
             super.failed();
             updateMessage("Failed!");
 
+            progressBar1.progressProperty().unbind();
+            progressBar1.setProgress(0);
             progressBar1.setDisable(true);
             labelStatus.getScene().setCursor(Cursor.DEFAULT);
             taOutput.setCursor(Cursor.DEFAULT);

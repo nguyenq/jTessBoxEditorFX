@@ -12,14 +12,7 @@
         <copy todir="${build.classes.dir}">
             <fileset dir="." includes="readme*.html"/>
         </copy>
-        <copy todir="${build.classes.dir}/data">
-            <fileset dir="./data" includes="*.*"/>
-        </copy>
-        <copy todir="${dist.dir}/data">
-            <fileset dir="./data" includes="*.*"/>
-        </copy>
     </target>
- 
     <target name="-post-jfx-jar">
         <copy todir="./">
             <fileset dir="${dist.dir}" includes="${ant.project.name}.jar" />

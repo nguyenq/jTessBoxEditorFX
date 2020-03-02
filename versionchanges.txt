@@ -32,4 +32,5 @@ Version 2.2.0 (30 October 2018)
 - Upgrade to Tesseract 4.0.0
 
 Version 2.3.0 (2 March 2020)
+- Upgrade Tesseract training executable 5.0.0-alpha (2020-02-23)
 - Update dependencies

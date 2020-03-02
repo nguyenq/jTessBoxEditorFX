@@ -160,6 +160,7 @@ public class BoxEditorController implements Initializable {
     private TableColumn<TessBox, Integer> tcNum;
 
     private static final String IMAGE_PATTERN = "([^\\s]+(\\.(?i)(png|tif|tiff))$)";
+    public static final String WORDSTR = "WordStr";
     protected ResourceBundle bundle;
     final Preferences prefs = MainController.prefs;
 
@@ -171,6 +172,7 @@ public class BoxEditorController implements Initializable {
     private int filterIndex;
     protected List<BufferedImage> imageList;
     private boolean isTess2_0Format;
+    private boolean isWordStrFormat;
     private BooleanProperty boxChangedProp;
     protected boolean tableSelectAction;
     static final String EOL = System.getProperty("line.separator");
@@ -701,7 +703,7 @@ public class BoxEditorController implements Initializable {
 
     List<TessBoxCollection> parseBoxString(String boxStr, List<BufferedImage> imageList) throws IOException {
         List<TessBoxCollection> allBoxPages = new ArrayList<TessBoxCollection>();
-
+        isWordStrFormat = false;
         String[] boxdata = boxStr.split("\\R"); // or "\\r?\\n"
         if (boxdata.length > 0) {
             // if only 5 fields, it's Tess 2.0x format
@@ -719,7 +721,7 @@ public class BoxEditorController implements Initializable {
                 String[] items = boxdata[i].split("(?<!^) +");
 
                 // skip invalid data
-                if (items.length < 5 || items.length > 6) {
+                if (items.length < 5 || (items.length > 6 && !items[0].equals(WORDSTR))) {
                     continue;
                 }
 
@@ -731,11 +733,17 @@ public class BoxEditorController implements Initializable {
                 y = pageHeight - y - h; // flip the y-coordinate
 
                 short page;
-                if (items.length == 6) {
+                if (items.length == 6 || (chrs.equals(WORDSTR) && items.length >= 7)) {
                     page = Short.parseShort(items[5]); // Tess 3.0x format
                 } else {
                     page = 0; // Tess 2.0x format
                 }
+                
+                if (chrs.equals(WORDSTR) && items.length >= 7 && items[6].startsWith("#")) {
+                    chrs = boxdata[i].substring(boxdata[i].indexOf("#") + 1);
+                    isWordStrFormat = true;
+                }
+                
                 if (page > curPage) {
                     startBoxIndex = i; // mark begin of next page
                     break;
@@ -853,7 +861,11 @@ public class BoxEditorController implements Initializable {
             int pageHeight = ((BufferedImage) imageList.get(pageIndex)).getHeight(); // each page (in an image) can have different height
             for (TessBox box : boxPages.get(pageIndex).toList()) {
                 Rectangle2D rect = box.getRect();
-                sb.append(String.format("%s %.0f %.0f %.0f %.0f %d", box.getCharacter(), rect.getMinX(), pageHeight - rect.getMinY() - rect.getHeight(), rect.getMinX() + rect.getWidth(), pageHeight - rect.getMinY(), pageIndex)).append(EOL);
+                if (isWordStrFormat && !box.getCharacter().equals("\t")) {
+                    sb.append(String.format("%s %.0f %.0f %.0f %.0f %d #%s", WORDSTR, rect.getMinX(), pageHeight - rect.getMinY() - rect.getHeight(), rect.getMinX() + rect.getWidth(), pageHeight - rect.getMinY(), pageIndex, box.getCharacter())).append(EOL);
+                } else {
+                    sb.append(String.format("%s %.0f %.0f %.0f %.0f %d", box.getCharacter(), rect.getMinX(), pageHeight - rect.getMinY() - rect.getHeight(), rect.getMinX() + rect.getWidth(), pageHeight - rect.getMinY(), pageIndex)).append(EOL);
+                }
             }
         }
         if (isTess2_0Format) {

@@ -61,6 +61,8 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.ClipboardContent;
+import javafx.scene.input.DataFormat;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
@@ -189,7 +191,7 @@ public class BoxEditorController implements Initializable {
     private final StringProperty fontFamily = new SimpleStringProperty(Font.getDefault().getFamily());
     private final IntegerProperty fontSize = new SimpleIntegerProperty((int) Font.getDefault().getSize());
     private final StringProperty style = new SimpleStringProperty();
-
+    private final static DataFormat SERIALIZED_MIME_TYPE = new DataFormat("application/x-java-serialized-object");
     private final static Logger logger = Logger.getLogger(BoxEditorController.class.getName());
 
     /**
@@ -248,6 +250,53 @@ public class BoxEditorController implements Initializable {
         tableView.setRowFactory(tv -> {
             TableRow<TessBox> row = new TableRow<>();
             row.styleProperty().bind(style);
+
+            row.setOnDragDetected(event -> {
+                if (!row.isEmpty()) {
+                    Integer index = row.getIndex();
+                    Dragboard db = row.startDragAndDrop(TransferMode.MOVE);
+                    db.setDragView(row.snapshot(null, null));
+                    ClipboardContent cc = new ClipboardContent();
+                    cc.put(SERIALIZED_MIME_TYPE, index);
+                    db.setContent(cc);
+                    event.consume();
+                }
+            });
+
+            row.setOnDragOver(event -> {
+                Dragboard db = event.getDragboard();
+                if (db.hasContent(SERIALIZED_MIME_TYPE)) {
+                    if (row.getIndex() != ((Integer) db.getContent(SERIALIZED_MIME_TYPE)).intValue()) {
+                        event.acceptTransferModes(TransferMode.COPY_OR_MOVE);
+                        event.consume();
+                    }
+                }
+            });
+
+            row.setOnDragDropped(event -> {
+                Dragboard db = event.getDragboard();
+                if (db.hasContent(SERIALIZED_MIME_TYPE)) {
+                    int draggedIndex = (Integer) db.getContent(SERIALIZED_MIME_TYPE);
+                    TessBox draggedBox = tableView.getItems().remove(draggedIndex);
+
+                    int dropIndex;
+
+                    if (row.isEmpty()) {
+                        dropIndex = tableView.getItems().size();
+                    } else {
+                        dropIndex = row.getIndex();
+                    }
+
+                    tableView.getItems().add(dropIndex, draggedBox);
+
+                    event.setDropCompleted(true);
+                    tableView.getSelectionModel().clearSelection();
+                    tableView.getSelectionModel().select(dropIndex);
+
+                    event.consume();
+                }
+            });
+
             return row;
         });
 
@@ -738,12 +787,12 @@ public class BoxEditorController implements Initializable {
                 } else {
                     page = 0; // Tess 2.0x format
                 }
-                
+
                 if (chrs.equals(WORDSTR) && items.length >= 7 && items[6].startsWith("#")) {
                     chrs = boxdata[i].substring(boxdata[i].indexOf("#") + 1);
                     isWordStrFormat = true;
                 }
-                
+
                 if (page > curPage) {
                     startBoxIndex = i; // mark begin of next page
                     break;

@@ -55,6 +55,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Cursor;
+import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -65,6 +66,8 @@ import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DataFormat;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -78,6 +81,7 @@ import javafx.stage.Stage;
 
 import net.sourceforge.tess4j.util.ImageIOHelper;
 import net.sourceforge.tessboxeditor.control.ImageCanvas;
+import net.sourceforge.tessboxeditor.control.IncrementHandler;
 import net.sourceforge.tessboxeditor.datamodel.TessBox;
 import net.sourceforge.tessboxeditor.datamodel.TessBoxCollection;
 import net.sourceforge.tessboxeditor.utilities.*;
@@ -236,6 +240,12 @@ public class BoxEditorController implements Initializable {
         HBox.setHgrow(rgn2, Priority.ALWAYS);
         HBox.setHgrow(rgn3, Priority.ALWAYS);
 
+        IncrementHandler handler = new IncrementHandler();
+        speedUpSpinner(spinnerX, handler);
+        speedUpSpinner(spinnerY, handler);
+        speedUpSpinner(spinnerW, handler);
+        speedUpSpinner(spinnerH, handler);
+       
         tfCharacter.focusedProperty().addListener((obs, wasFocused, isNowFocused) -> {
             if (!isNowFocused && !this.btnConvert.isFocused()) {
                 if (boxes != null && boxes.getSelectedBoxes().size() == 1) {
@@ -1064,4 +1074,16 @@ public class BoxEditorController implements Initializable {
         prefs.putInt("filterIndex", filterIndex);
     }
 
+    void speedUpSpinner(Spinner spinner, IncrementHandler handler) {
+        spinner.addEventFilter(MouseEvent.MOUSE_PRESSED, handler);
+        spinner.addEventFilter(MouseEvent.MOUSE_RELEASED, evt -> {
+            Node node = evt.getPickResult().getIntersectedNode();
+            if (node.getStyleClass().contains("increment-arrow-button")
+                    || node.getStyleClass().contains("decrement-arrow-button")) {
+                if (evt.getButton() == MouseButton.PRIMARY) {
+                    handler.stop();
+                }
+            }
+        });
+    }
 }

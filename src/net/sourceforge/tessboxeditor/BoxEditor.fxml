@@ -101,13 +101,13 @@
                 <Label text="W" />
                 <Spinner fx:id="spinnerW" prefWidth="75.0">
                     <valueFactory>
-                        <SpinnerValueFactory.IntegerSpinnerValueFactory initialValue="0" max="500" min="0" />
+                        <SpinnerValueFactory.IntegerSpinnerValueFactory initialValue="0" max="5000" min="0" />
                     </valueFactory> 
                 </Spinner> 
                 <Label text="H" />
                 <Spinner fx:id="spinnerH" prefWidth="75.0">
                     <valueFactory>
-                        <SpinnerValueFactory.IntegerSpinnerValueFactory initialValue="0" max="500" min="0" />
+                        <SpinnerValueFactory.IntegerSpinnerValueFactory initialValue="0" max="5000" min="0" />
                     </valueFactory> 
                 </Spinner> 
                 <Region fx:id="rgn3" />

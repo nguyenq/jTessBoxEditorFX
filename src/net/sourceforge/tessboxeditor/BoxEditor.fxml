@@ -27,7 +27,7 @@
 <?import javafx.scene.shape.Rectangle?>
 <?import net.sourceforge.tessboxeditor.control.*?>
 
-<BorderPane prefHeight="600.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.sourceforge.tessboxeditor.BoxEditorKeyEventController">
+<BorderPane prefHeight="600.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.sourceforge.tessboxeditor.BoxEditorKeyEventController">
     <top>
         <ToolBar prefHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER">
             <items>
@@ -130,7 +130,7 @@
                                                         <TableView fx:id="tableView" editable="true" prefHeight="75.0" prefWidth="259.0" BorderPane.alignment="CENTER">
                                                             <columns>
                                                                 <TableColumn fx:id="tcNum" editable="false" prefWidth="50.0" sortable="false" />
-                                                                <TableColumn fx:id="tcChar" prefWidth="50.0" sortable="false" text="Char" />
+                                                                <TableColumn fx:id="tcChar" prefWidth="50.0" sortable="false" style="-fx-alignment: CENTER_LEFT;" text="Char" />
                                                                 <TableColumn fx:id="tcX" editable="false" prefWidth="50.0" sortable="false" text="X" />
                                                                 <TableColumn fx:id="tcY" editable="false" prefWidth="50.0" sortable="false" text="Y" />
                                                                 <TableColumn fx:id="tcWidth" editable="false" prefWidth="50.0" sortable="false" text="Width" />

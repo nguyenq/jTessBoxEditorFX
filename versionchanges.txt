@@ -33,6 +33,8 @@ Version 2.2.0 (30 October 2018)
 
 Version 2.3.0 (3 March 2020)
 - Support WordStr box format
+- Re-order boxes
 - Fix column alignment
+- Speed up spinners
 - Upgrade Tesseract training executable 5.0.0-alpha (2020-02-23)
 - Update dependencies

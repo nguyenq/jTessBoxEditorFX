@@ -257,6 +257,7 @@ public class BoxEditorController implements Initializable {
             }
         });
 
+        // https://stackoverflow.com/questions/28603224/sort-tableview-with-drag-and-drop-rows
         tableView.setRowFactory(tv -> {
             TableRow<TessBox> row = new TableRow<>();
             row.styleProperty().bind(style);

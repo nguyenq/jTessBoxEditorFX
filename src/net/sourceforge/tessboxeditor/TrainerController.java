@@ -112,8 +112,8 @@ public class TrainerController implements Initializable {
         fcTrainingData.setTitle("Set Location of Source Training Data");
         fcTrainingData.setInitialDirectory(new File(trainDataDirectory));
 
-        tfLang.setText(prefs.get("trainnedLanguage", null));
-        tfBootstrapLang.setText(prefs.get("bootstrapLanguage", null));
+        tfLang.setText(prefs.get("trainnedLanguage", ""));
+        tfBootstrapLang.setText(prefs.get("bootstrapLanguage", ""));
         cbOps.getItems().addAll(TrainingMode.values());
         cbOps.getSelectionModel().select(prefs.getInt("trainingMode", 0));
         chbRTL.setSelected(prefs.getBoolean("trainingRTL", false));
@@ -363,12 +363,8 @@ public class TrainerController implements Initializable {
         if (trainDataDirectory != null) {
             prefs.put("trainDataDirectory", trainDataDirectory);
         }
-        if (this.tfLang.getText() != null) {
-            prefs.put("trainnedLanguage", this.tfLang.getText());
-        }
-        if (this.tfBootstrapLang.getText() != null) {
-            prefs.put("bootstrapLanguage", this.tfBootstrapLang.getText());
-        }
+        prefs.put("trainnedLanguage", this.tfLang.getText());
+        prefs.put("bootstrapLanguage", this.tfBootstrapLang.getText());
         prefs.putInt("trainingMode", this.cbOps.getSelectionModel().getSelectedIndex());
         prefs.putBoolean("trainingRTL", this.chbRTL.isSelected());
     }

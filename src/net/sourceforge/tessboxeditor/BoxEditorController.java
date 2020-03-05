@@ -393,6 +393,7 @@ public class BoxEditorController implements Initializable {
                 tfCharacter.setText(str);
                 tfChar.setText(str);
                 tfCodepointValue.setText(Utils.toHex(str));
+                boxChangedProp.set(true);
             }
         });
         tcX.setCellValueFactory(new PropertyValueFactory<TessBox, Integer>("x"));

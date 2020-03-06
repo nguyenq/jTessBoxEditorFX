@@ -210,7 +210,7 @@ public class TrainerController implements Initializable {
         });
 
         // warn about potential box overwrite
-        if (selectedMode == TrainingMode.Make_Box_File_Only || selectedMode == TrainingMode.Train_from_Scratch) {
+        if (selectedMode == TrainingMode.Make_Box_File || selectedMode == TrainingMode.Make_LSTM_Box_File || selectedMode == TrainingMode.Make_WordStr_Box_File || selectedMode == TrainingMode.Train_from_Scratch) {
             if (boxFiles.length > 0) {
                 Alert alert = new Alert(AlertType.CONFIRMATION, "There are existing box files. Continuing may overwrite them.\nDo you want to proceed?");
                 alert.setHeaderText(null);

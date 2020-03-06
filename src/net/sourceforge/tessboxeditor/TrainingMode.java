@@ -25,9 +25,13 @@ public enum TrainingMode {
      */
     HeaderText("-- Training Mode --"),
     /**
-     * Make box only.
+     * Make box.
      */
-    Make_Box_File_Only("Make Box File Only"),
+    Make_Box_File("Make Box File"),
+    /**
+     * Make LSTM box.
+     */
+    Make_LSTM_Box_File("Make LSTM Box File"),
     /**
      * Make WordStr box.
      */

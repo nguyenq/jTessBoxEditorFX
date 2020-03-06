@@ -36,6 +36,7 @@ public class TessTrainer {
     private static final String cmdtext2image = "text2image --text=%s --outputbase=%s --font=%s --ptsize=%d --fonts_dir=%s --exposure=%d --char_spacing=%f --leading=%d --xsize=%d --ysize=%d";
     private static final String cmdmake_box = "tesseract imageFile boxFile -l bootstrapLang batch.nochop makebox";
     private static final String cmdmake_wordstr_box = "tesseract imageFile boxFile -l bootstrapLang wordstrbox";
+    private static final String cmdmake_lstm_box = "tesseract imageFile boxFile -l bootstrapLang lstmbox";
     private static final String cmdtess_train = "tesseract imageFile boxFile box.train";
     private static final String cmdunicharset_extractor = "unicharset_extractor"; // lang.fontname.exp0.box lang.fontname.exp1.box ...
     private static final String cmdset_unicharset_properties = "set_unicharset_properties -U unicharset -O unicharset --script_dir=%s";
@@ -80,11 +81,10 @@ public class TessTrainer {
      */
     public void generate(TrainingMode mode) throws Exception {
         switch (mode) {
-            case Make_Box_File_Only:
-                makeBox();
-                break;
+            case Make_Box_File:
+            case Make_LSTM_Box_File:
             case Make_WordStr_Box_File:
-                makeWordStrBox();
+                makeBox(mode);
                 break;
             case Train_with_Existing_Box:
                 generateTraineddata(true);
@@ -105,7 +105,7 @@ public class TessTrainer {
 
     /**
      * Run text2image command to generate Tiff/Box pair.
-     * 
+     *
      * @param inputTextFile
      * @param outputbase
      * @param font
@@ -115,7 +115,7 @@ public class TessTrainer {
      * @param leading
      * @param width
      * @param height
-     * @throws Exception 
+     * @throws Exception
      */
     void text2image(String inputTextFile, String outputbase, Font font, String fontFolder, int exposure, float char_spacing, int leading, int width, int height) throws Exception {
         logger.info("text2image");
@@ -137,9 +137,21 @@ public class TessTrainer {
      *
      * @throws Exception
      */
-    void makeBox() throws Exception {
-        //cmdmake_box
-        List<String> cmd = getCommand(cmdmake_box);
+    void makeBox(TrainingMode boxType) throws Exception {
+        String makeBoxCommand;
+        switch (boxType) {
+            case Make_LSTM_Box_File:
+                makeBoxCommand = cmdmake_lstm_box;
+                break;
+            case Make_WordStr_Box_File:
+                makeBoxCommand = cmdmake_wordstr_box;
+                break;
+            default:
+                makeBoxCommand = cmdmake_box;
+                break;
+        }
+
+        List<String> cmd = getCommand(makeBoxCommand);
 
         // if no bootstrap
         if (bootstrapLang.length() == 0) {
@@ -155,40 +167,8 @@ public class TessTrainer {
             throw new RuntimeException("There are no training images.");
         }
 
-        logger.info("Make Box Files");
-        writeMessage("** Make Box Files **");
-        for (String file : files) {
-            cmd.set(1, file);
-            cmd.set(2, TextUtilities.stripExtension(file));
-            runCommand(cmd);
-        }
-    }
-            
-    /**
-     * Makes WordStr box files.
-     *
-     * @throws Exception
-     */
-    void makeWordStrBox() throws Exception {
-        //cmdmake_wordstr_box
-        List<String> cmd = getCommand(cmdmake_wordstr_box);
-
-        // if no bootstrap
-        if (bootstrapLang.length() == 0) {
-            cmd.remove(4);
-            cmd.remove(3);
-        } else {
-            cmd.set(4, bootstrapLang);
-        }
-
-        String[] files = getImageFiles();
-
-        if (files.length == 0) {
-            throw new RuntimeException("There are no training images.");
-        }
-
-        logger.info("Make WordStr Box Files");
-        writeMessage("** Make WordStr Box Files **");
+        logger.info(boxType.toString());
+        writeMessage(String.format("** %s **", boxType.toString()));
         for (String file : files) {
             cmd.set(1, file);
             cmd.set(2, TextUtilities.stripExtension(file));
@@ -204,7 +184,7 @@ public class TessTrainer {
      */
     void generateTraineddata(boolean skipBoxGeneration) throws Exception {
         if (!skipBoxGeneration) {
-            makeBox();
+            makeBox(TrainingMode.Make_Box_File);
         }
 
         String[] files = getImageFilesWithBox();

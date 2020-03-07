@@ -189,6 +189,8 @@ public class BoxEditorController implements Initializable {
 
     protected static int iconMargin = 3;
     protected static int scaleFactor = 4;
+    protected static int fixedMinColWidth = 50;
+    protected static int fixedMaxColWidth = 60;
 
     Image image;
 
@@ -990,6 +992,7 @@ public class BoxEditorController implements Initializable {
     void setFont(Font font) {
         // set font for TableColumn, TextField controls, etc.
         this.taBoxData.setFont(font);
+        setColumnWidth();
         Font font15 = net.sourceforge.tessboxeditor.utilities.Utils.deriveFont(font, Font.getDefault().getSize());
         this.tfCharacter.setFont(font15);
         this.tfFind.setFont(font15);
@@ -1005,6 +1008,32 @@ public class BoxEditorController implements Initializable {
         //rowHeader.setFont(tableFont);
 //        ((MyTableCellEditor)jTable.getDefaultEditor(String.class)).setFont(font);
         this.imageCanvas.setFont(font);
+    }
+    
+    void setColumnWidth() {
+        double factor;
+        if (this.taBoxData.getFont().getSize() >= 36) {
+            factor = 2;
+        } else if (this.taBoxData.getFont().getSize() >= 24) {
+            factor = 1.4;
+        } else {
+            factor = this.taBoxData.getFont().getSize() / 12;
+        }
+        
+        int minColWidth = (int) (fixedMinColWidth * factor);
+        tcNum.setMinWidth(minColWidth);
+        tcChar.setMinWidth(minColWidth);
+        tcX.setMinWidth(minColWidth);
+        tcY.setMinWidth(minColWidth);
+        tcWidth.setMinWidth(minColWidth);
+        tcHeight.setMinWidth(minColWidth);
+        
+        int maxColWidth = (int) (fixedMaxColWidth * factor);
+        tcNum.setMaxWidth(minColWidth);
+        tcX.setMaxWidth(maxColWidth);
+        tcY.setMaxWidth(maxColWidth);
+        tcWidth.setMaxWidth(maxColWidth);
+        tcHeight.setMaxWidth(maxColWidth);
     }
 
     /**

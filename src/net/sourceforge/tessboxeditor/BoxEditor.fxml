@@ -129,12 +129,12 @@
                                                     <center>
                                                         <TableView fx:id="tableView" editable="true" prefHeight="75.0" prefWidth="259.0" BorderPane.alignment="CENTER">
                                                             <columns>
-                                                                <TableColumn fx:id="tcNum" editable="false" maxWidth="60.0" minWidth="40.0" prefWidth="50.0" sortable="false" />
+                                                                <TableColumn fx:id="tcNum" editable="false" maxWidth="60.0" minWidth="50.0" prefWidth="50.0" sortable="false" />
                                                                 <TableColumn fx:id="tcChar" minWidth="50.0" prefWidth="50.0" sortable="false" style="-fx-alignment: CENTER_LEFT;" text="Char" />
-                                                                <TableColumn fx:id="tcX" editable="false" maxWidth="70.0" minWidth="50.0" prefWidth="50.0" sortable="false" text="X" />
-                                                                <TableColumn fx:id="tcY" editable="false" maxWidth="70.0" minWidth="50.0" prefWidth="50.0" sortable="false" text="Y" />
-                                                                <TableColumn fx:id="tcWidth" editable="false" maxWidth="70.0" minWidth="50.0" prefWidth="50.0" sortable="false" text="Width" />
-                                                                <TableColumn fx:id="tcHeight" editable="false" maxWidth="70.0" minWidth="50.0" prefWidth="50.0" sortable="false" text="Height" />
+                                                                <TableColumn fx:id="tcX" editable="false" maxWidth="60.0" minWidth="50.0" prefWidth="50.0" sortable="false" text="X" />
+                                                                <TableColumn fx:id="tcY" editable="false" maxWidth="60.0" minWidth="50.0" prefWidth="50.0" sortable="false" text="Y" />
+                                                                <TableColumn fx:id="tcWidth" editable="false" maxWidth="60.0" minWidth="50.0" prefWidth="50.0" sortable="false" text="Width" />
+                                                                <TableColumn fx:id="tcHeight" editable="false" maxWidth="60.0" minWidth="50.0" prefWidth="50.0" sortable="false" text="Height" />
                                                             </columns>
                                                             <columnResizePolicy>
                                                                 <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />

@@ -47,6 +47,7 @@ import net.sourceforge.tess4j.Tesseract;
 import net.sourceforge.tess4j.util.ImageIOHelper;
 import net.sourceforge.tessboxeditor.datamodel.TessBox;
 import net.sourceforge.tessboxeditor.datamodel.TessBoxCollection;
+import net.sourceforge.vietocr.util.Utils;
 
 public class BoxEditorEditController extends BoxEditorController {
 
@@ -338,7 +339,7 @@ public class BoxEditorEditController extends BoxEditorController {
                 }
 
                 List<BufferedImage> imageList = ImageIOHelper.getImageList(imageFile);
-                String str = readBoxFile(boxFile);
+                String str = Utils.readTextFile(boxFile);
                 List<TessBoxCollection> boxPages = parseBoxString(str, imageList);
                 performSegment(imageList, boxPages, instance);
 

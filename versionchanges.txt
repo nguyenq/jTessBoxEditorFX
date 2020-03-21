@@ -31,7 +31,7 @@ Version 2.1.0 (19 September 2018)
 Version 2.2.0 (30 October 2018)
 - Upgrade to Tesseract 4.0.0
 
-Version 2.3.0 (6 March 2020)
+Version 2.3.0 (21 March 2020)
 - Support LSTM & WordStr box format
 - Support reordering boxes through table row drag-and-drop
 - Fix column alignment

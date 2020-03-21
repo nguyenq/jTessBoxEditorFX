@@ -733,7 +733,7 @@ public class BoxEditorController implements Initializable {
                 boxPages.clear();
 
                 // load into textarea first
-                String content = readBoxFile(boxFile);
+                String content = Utils.readTextFile(boxFile);
                 boxPages = parseBoxString(content, imageList);
 
                 Platform.runLater(() -> {
@@ -758,10 +758,6 @@ public class BoxEditorController implements Initializable {
             imageCanvas.setTable(null);
             imageCanvas.paint();
         }
-    }
-
-    String readBoxFile(File boxFile) throws IOException {
-        return new String(Files.readAllBytes(Paths.get(boxFile.getPath())), StandardCharsets.UTF_8);
     }
 
     List<TessBoxCollection> parseBoxString(String boxStr, List<BufferedImage> imageList) throws IOException {

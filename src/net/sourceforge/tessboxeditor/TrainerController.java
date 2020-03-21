@@ -268,7 +268,9 @@ public class TrainerController implements Initializable {
                     String msg = ex.getMessage();
 
                     if (msg != null) {
-                        new Alert(Alert.AlertType.NONE, msg, ButtonType.OK).show();
+                        Alert alert = new Alert(Alert.AlertType.NONE, msg, ButtonType.OK);
+                        alert.setTitle("Train Tesseract");
+                        alert.show();
                     }
                 }
             });

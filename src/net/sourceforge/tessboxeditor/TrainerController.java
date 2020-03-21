@@ -93,7 +93,10 @@ public class TrainerController implements Initializable {
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        tessDirectory = prefs.get("tessDirectory", MainController.WINDOWS ? new File(System.getProperty("user.dir"), "tesseract-ocr").getPath() : "/usr/bin");
+        tessDirectory = prefs.get("tessDirectory", null);
+        if (tessDirectory == null || !new File(tessDirectory).exists()) {
+            tessDirectory = MainController.WINDOWS ? new File(System.getProperty("user.dir"), "tesseract-ocr").getPath() : "/usr/bin";        
+        }
         tfTessDir.setText(tessDirectory);
         tfTessDir.setStyle("-fx-focus-color: transparent;");
 

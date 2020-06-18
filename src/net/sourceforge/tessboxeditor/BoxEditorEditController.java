@@ -190,22 +190,30 @@ public class BoxEditorEditController extends BoxEditorController {
         if (boxes == null) {
             return;
         }
-        List<TessBox> selected = boxes.getSelectedBoxes();
-        if (selected.size() <= 0) {
-            Alert alert = new Alert(Alert.AlertType.NONE, "Please select the box to insert after.", ButtonType.OK);
-            alert.show();
-            return;
-        } else if (selected.size() > 1) {
-            Alert alert = new Alert(Alert.AlertType.NONE, "Please select only one box for Insert operation.", ButtonType.OK);
-            alert.show();
-            return;
-        }
+        TessBox newBox;
+        int index;
 
-        TessBox box = selected.get(0);
-        int index = this.boxes.toList().indexOf(box);
-        index++;
-        // offset the new box 15 pixel from the base one
-        TessBox newBox = new TessBox(" ", new Rectangle2D(box.getX() + 15, box.getY(), box.getWidth(), box.getHeight()), box.getPage());
+        if (boxes.toList().isEmpty()) {
+            newBox = new TessBox(" ", new Rectangle2D(0, 0, 20, 30), (short) 0);
+            index = 0;
+        } else {
+            List<TessBox> selected = boxes.getSelectedBoxes();
+            if (selected.size() <= 0) {
+                Alert alert = new Alert(Alert.AlertType.NONE, "Please select the box to insert after.", ButtonType.OK);
+                alert.show();
+                return;
+            } else if (selected.size() > 1) {
+                Alert alert = new Alert(Alert.AlertType.NONE, "Please select only one box for Insert operation.", ButtonType.OK);
+                alert.show();
+                return;
+            }
+
+            TessBox box = selected.get(0);
+            index = this.boxes.toList().indexOf(box);
+            index++;
+            // offset the new box 15 pixel from the base one
+            newBox = new TessBox(" ", new Rectangle2D(box.getX() + 15, box.getY(), box.getWidth(), box.getHeight()), box.getPage());
+        }
         boxes.add(index, newBox);
         tableView.getSelectionModel().clearAndSelect(index);
         this.imageCanvas.paint();

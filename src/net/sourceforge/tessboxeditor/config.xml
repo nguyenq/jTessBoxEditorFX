@@ -3,5 +3,5 @@
 <properties>
     <comment>Configuration File</comment>
     <entry key="ReleaseDate">2020-08-10</entry>
-    <entry key="Version">v2.3.2-beta</entry>
+    <entry key="Version">v2.3.2</entry>
 </properties>

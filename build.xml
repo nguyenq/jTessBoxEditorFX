@@ -6,14 +6,14 @@
 <project name="jTessBoxEditorFX" default="default" basedir="." xmlns:fx="javafx:com.sun.javafx.tools.ant">
     <description>Builds, tests, and runs the project jTessBoxEditor.</description>
     <import file="nbproject/build-impl.xml"/>
-    <property name="version" value="2.3.1"/>
+    <property name="version" value="2.3.2"/>
 
     <target name="-post-compile">
         <copy todir="${build.classes.dir}">
             <fileset dir="." includes="readme*.html"/>
         </copy>
     </target>
-    <target name="-post-jfx-jar">
+    <target name="-post-jar">
         <copy todir="./">
             <fileset dir="${dist.dir}" includes="${ant.project.name}.jar" />
         </copy>

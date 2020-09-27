@@ -47,3 +47,7 @@ Version 2.3.1 (17 June 2020)
 Version 2.3.2 (10 August 2020)
 - Use Java 14 and JavaFX 14
 - Update dependencies
+
+Version 2.3.3-Beta (27 September 2020)
+- Use JavaFX 15
+- Update dependencies

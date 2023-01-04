@@ -374,7 +374,7 @@ public class ImageGeneratorController implements Initializable {
             }
 
             btnGenerate.setDisable(true);
-            taInput.getScene().setCursor(Cursor.WAIT);
+            taInput.getScene().getRoot().setCursor(Cursor.WAIT);
 
             generateTiffBox();
         } else if (event.getSource() == btnClear) {
@@ -392,7 +392,7 @@ public class ImageGeneratorController implements Initializable {
         textFlow.setPrefWidth((int) this.spnW.getValue());
         textFlow.getChildren().clear();
         allText.clear();
-        
+
         List<Text> texts = new ArrayList<Text>();
         List<Rectangle> boxes = new ArrayList<Rectangle>();
 
@@ -406,7 +406,7 @@ public class ImageGeneratorController implements Initializable {
             Text text = new Text(ch);
             text.setFont(textFont);
             texts.add(text);
-            
+
             Rectangle box = new Rectangle(0, 0, Color.TRANSPARENT);
             boxes.add(box);
 
@@ -538,8 +538,13 @@ public class ImageGeneratorController implements Initializable {
             alert.setHeaderText(null);
             alert.showAndWait();
         } finally {
-            btnGenerate.setDisable(false);
-            taInput.getScene().setCursor(Cursor.DEFAULT);
+            Platform.runLater(new Runnable() {
+                @Override
+                public void run() {
+                    btnGenerate.setDisable(false);
+                    taInput.getScene().getRoot().setCursor(Cursor.DEFAULT);
+                }
+            });
         }
     }
 
@@ -548,7 +553,7 @@ public class ImageGeneratorController implements Initializable {
                 .filter(b -> b instanceof Rectangle)
                 .map(b -> (Rectangle) b)
                 .collect(Collectors.toList());
-        
+
         int printableHeight = pageNum == 1 ? height - margin * 2 : height - margin * 2 * pageNum;
         Optional<Rectangle> op = boxes.stream().filter(b -> (b.getY() + b.getHeight()) > printableHeight).findFirst();
         if (op.isPresent()) {

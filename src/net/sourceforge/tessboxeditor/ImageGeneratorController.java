@@ -474,7 +474,8 @@ public class ImageGeneratorController implements Initializable {
         if (chbText2Image.isSelected()) {
             final String prefixF = prefix;
             final long lastModifiedF = lastModified;
-            // execute Text2Image
+            
+            // execute Text2Image program on background task
             Task<Void> worker = new Task<Void>() {
 
                 @Override
@@ -525,7 +526,6 @@ public class ImageGeneratorController implements Initializable {
             };
 
             new Thread(worker).start();
-            return;
         } else {
             try {
                 // make box
@@ -547,6 +547,7 @@ public class ImageGeneratorController implements Initializable {
                 textPages.clear();
                 breakPages((int) this.spnH.getValue());
 
+                // this JavaFX-based method is executed on FX Application thread since it involves and relies on UI elements to generate the image
                 TiffBoxGeneratorFX generator = new TiffBoxGeneratorFX(textPages, fontGen, (int) this.spnW.getValue(), (int) this.spnH.getValue());
                 generator.setOutputFolder(new File(outputDirectory));
                 generator.setFileName(prefix + this.tfFileName.getText());

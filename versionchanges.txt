@@ -51,6 +51,7 @@ Version 2.3.2 (2 December 2020)
 
 Version 2.4.0 (5 January 2023)
 - Upgrade Tesseract training executable 5.3.0
+- Add fontconfig_tmpdir command option for text2image
 - Implement Remove empty boxes function
 - Update dependencies
 - Use JavaFX 19

@@ -35,6 +35,7 @@ import javafx.beans.Observable;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -459,30 +460,74 @@ public class ImageGeneratorController implements Initializable {
     }
 
     void generateTiffBox() {
-        try {
-            String prefix = this.tfPrefix.getText();
-            if (prefix.trim().length() > 0) {
-                prefix += ".";
-            }
+        String prefix = this.tfPrefix.getText();
+        if (prefix.trim().length() > 0) {
+            prefix += ".";
+        }
 
-            long lastModified = 0;
-            File fontpropFile = new File(outputDirectory, prefix + "font_properties");
-            if (fontpropFile.exists()) {
-                lastModified = fontpropFile.lastModified();
-            }
+        long lastModified = 0;
+        File fontpropFile = new File(outputDirectory, prefix + "font_properties");
+        if (fontpropFile.exists()) {
+            lastModified = fontpropFile.lastModified();
+        }
 
-            if (chbText2Image.isSelected()) {
-                // execute Text2Image
-                String tessDirectory = ((TextField) menuBar.getScene().lookup("#tfTessDir")).getText();
-                TessTrainer trainer = new TessTrainer(tessDirectory, outputDirectory, tfPrefix.getText(), null, false);
-                String outputbase = tfFileName.getText();
-                if (outputbase.endsWith(".tif")) {
-                    outputbase = outputbase.substring(0, outputbase.lastIndexOf(".tif"));
+        if (chbText2Image.isSelected()) {
+            final String prefixF = prefix;
+            final long lastModifiedF = lastModified;
+            // execute Text2Image
+            Task<Void> worker = new Task<Void>() {
+
+                @Override
+                protected Void call() throws Exception {
+                    String tessDirectory = ((TextField) menuBar.getScene().lookup("#tfTessDir")).getText();
+                    TessTrainer trainer = new TessTrainer(tessDirectory, outputDirectory, tfPrefix.getText(), null, false);
+                    String outputbase = tfFileName.getText();
+                    if (outputbase.endsWith(".tif")) {
+                        outputbase = outputbase.substring(0, outputbase.lastIndexOf(".tif"));
+                    }
+                    outputbase = outputDirectory + "/" + prefixF + outputbase;
+                    trainer.text2image(inputTextFile.getPath(), outputbase, fontGen, tfFontFolder.getText(), (int) spnExposure.getValue(), spnTracking.getValue().floatValue(), spnLeading.getValue(), (int) spnW.getValue(), (int) spnH.getValue());
+//                        Utils.removeEmptyBoxes(new File(outputbase + ".box"));
+                    return null;
                 }
-                outputbase = outputDirectory + "/" + prefix + outputbase;
-                trainer.text2image(inputTextFile.getPath(), outputbase, fontGen, tfFontFolder.getText(), (int) this.spnExposure.getValue(), this.spnTracking.getValue().floatValue(), this.spnLeading.getValue(), (int) this.spnW.getValue(), (int) this.spnH.getValue());
-//                Utils.removeEmptyBoxes(new File(outputbase + ".box"));
-            } else {
+
+                @Override
+                protected void succeeded() {
+                    super.succeeded();
+                    updateMessage("Done!");
+                    // update font_properties file
+                    Utils.updateFontProperties(new File(outputDirectory), prefixF + tfFileName.getText(), fontGen);
+                    String msg = String.format("TIFF/Box files have been generated and saved in %s folder.", outputDirectory);
+
+                    if (fontpropFile.exists() && lastModifiedF != fontpropFile.lastModified()) {
+                        msg = msg.concat("\nBe sure to check the entries in font_properties file for accuracy.");
+                    }
+                    Alert alert = new Alert(Alert.AlertType.NONE, msg, ButtonType.OK);
+                    alert.setTitle(JTessBoxEditor.APP_NAME);
+                    // workaround text truncate in Linux
+                    alert.getDialogPane().getChildren().stream().filter(node -> node instanceof Label).forEach(node -> ((Label) node).setMinHeight(Region.USE_PREF_SIZE));
+                    alert.showAndWait();
+                    btnGenerate.setDisable(false);
+                    taInput.getScene().getRoot().setCursor(Cursor.DEFAULT);
+                }
+
+                @Override
+                protected void failed() {
+                    super.failed();
+                    Throwable e = getException();
+                    Alert alert = new Alert(Alert.AlertType.ERROR, e.getMessage() != null ? e.getMessage() : e.toString(), ButtonType.OK);
+                    alert.setTitle(JTessBoxEditor.APP_NAME);
+                    alert.setHeaderText(null);
+                    alert.showAndWait();
+                    btnGenerate.setDisable(false);
+                    taInput.getScene().getRoot().setCursor(Cursor.DEFAULT);
+                }
+            };
+
+            new Thread(worker).start();
+            return;
+        } else {
+            try {
                 // make box
                 if (tabPane.getSelectionModel().getSelectedIndex() == 0) {
                     tabPane.getSelectionModel().select(1);
@@ -511,40 +556,40 @@ public class ImageGeneratorController implements Initializable {
                 generator.setNoiseAmount((int) this.spnNoise.getValue());
                 generator.setAntiAliasing(this.chbAntiAliasing.isSelected());
                 generator.create();
-            }
 
-            // update font_properties file
-            Utils.updateFontProperties(new File(outputDirectory), prefix + this.tfFileName.getText(), fontGen);
-            String msg = String.format("TIFF/Box files have been generated and saved in %s folder.", outputDirectory);
+                // update font_properties file
+                Utils.updateFontProperties(new File(outputDirectory), prefix + this.tfFileName.getText(), fontGen);
+                String msg = String.format("TIFF/Box files have been generated and saved in %s folder.", outputDirectory);
 
-            if (fontpropFile.exists() && lastModified != fontpropFile.lastModified()) {
-                msg = msg.concat("\nBe sure to check the entries in font_properties file for accuracy.");
-            }
-            Alert alert = new Alert(Alert.AlertType.NONE, msg, ButtonType.OK);
-            alert.setTitle(JTessBoxEditor.APP_NAME);
-            // workaround text truncate in Linux
-            alert.getDialogPane().getChildren().stream().filter(node -> node instanceof Label).forEach(node -> ((Label) node).setMinHeight(Region.USE_PREF_SIZE));
-            alert.showAndWait();
-        } catch (OutOfMemoryError oome) {
-            String msg = "The input text was probably too large. Please reduce it to a more manageable amount.";
-            Alert alert = new Alert(Alert.AlertType.ERROR, msg, ButtonType.OK);
-            alert.setTitle("Out-Of-Memory Error");
-            alert.setHeaderText(null);
-            alert.showAndWait();
-        } catch (Exception e) {
-            //e.printStackTrace();
-            Alert alert = new Alert(Alert.AlertType.ERROR, e.getMessage() != null ? e.getMessage() : e.toString(), ButtonType.OK);
-            alert.setTitle(JTessBoxEditor.APP_NAME);
-            alert.setHeaderText(null);
-            alert.showAndWait();
-        } finally {
-            Platform.runLater(new Runnable() {
-                @Override
-                public void run() {
-                    btnGenerate.setDisable(false);
-                    taInput.getScene().getRoot().setCursor(Cursor.DEFAULT);
+                if (fontpropFile.exists() && lastModified != fontpropFile.lastModified()) {
+                    msg = msg.concat("\nBe sure to check the entries in font_properties file for accuracy.");
                 }
-            });
+                Alert alert = new Alert(Alert.AlertType.NONE, msg, ButtonType.OK);
+                alert.setTitle(JTessBoxEditor.APP_NAME);
+                // workaround text truncate in Linux
+                alert.getDialogPane().getChildren().stream().filter(node -> node instanceof Label).forEach(node -> ((Label) node).setMinHeight(Region.USE_PREF_SIZE));
+                alert.showAndWait();
+            } catch (OutOfMemoryError oome) {
+                String msg = "The input text was probably too large. Please reduce it to a more manageable amount.";
+                Alert alert = new Alert(Alert.AlertType.ERROR, msg, ButtonType.OK);
+                alert.setTitle("Out-Of-Memory Error");
+                alert.setHeaderText(null);
+                alert.showAndWait();
+            } catch (Exception e) {
+                //e.printStackTrace();
+                Alert alert = new Alert(Alert.AlertType.ERROR, e.getMessage() != null ? e.getMessage() : e.toString(), ButtonType.OK);
+                alert.setTitle(JTessBoxEditor.APP_NAME);
+                alert.setHeaderText(null);
+                alert.showAndWait();
+            } finally {
+                Platform.runLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        btnGenerate.setDisable(false);
+                        taInput.getScene().getRoot().setCursor(Cursor.DEFAULT);
+                    }
+                });
+            }
         }
     }
 

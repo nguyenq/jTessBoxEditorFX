@@ -89,6 +89,8 @@ public class MainMenuController implements Initializable {
     @FXML
     private MenuItem miMarkEOLBulk;
     @FXML
+    private MenuItem miRemoveEmptyBoxes;
+    @FXML
     private Menu menuSettings;
     @FXML
     private MenuItem miFont;
@@ -162,6 +164,8 @@ public class MainMenuController implements Initializable {
             ((Button) menuBar.getScene().lookup("#btnMarkEOL")).fire();
         } else if (event.getSource() == miMarkEOLBulk) {
             ((Button) menuBar.getScene().lookup("#btnMarkEOLBulk")).fire();    
+        } else if (event.getSource() == miRemoveEmptyBoxes) {
+            ((Button) menuBar.getScene().lookup("#btnRemoveEmptyBoxes")).fire();    
         } else if (event.getSource() == miFont) {
             FontSelectorDialog dialog = new FontSelectorDialog(font);
             Optional<Font> op = dialog.showAndWait();

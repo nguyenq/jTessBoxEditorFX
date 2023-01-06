@@ -7,7 +7,7 @@
 <?import javafx.scene.input.KeyCodeCombination?>
 <?import javafx.scene.layout.BorderPane?>
 
-<MenuBar fx:id="menuBar" BorderPane.alignment="CENTER" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.sourceforge.tessboxeditor.MainMenuController">
+<MenuBar fx:id="menuBar" BorderPane.alignment="CENTER" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.sourceforge.tessboxeditor.MainMenuController">
     <menus>
         <Menu onAction="#handleAction" text="_File">
             <items>
@@ -57,6 +57,8 @@
             <SeparatorMenuItem mnemonicParsing="false" />
             <MenuItem fx:id="miMarkEOL" mnemonicParsing="false" onAction="#handleAction" text="Mark EOL" />
             <MenuItem fx:id="miMarkEOLBulk" mnemonicParsing="false" onAction="#handleAction" text="Mark EOL Bulk..." />
+            <SeparatorMenuItem mnemonicParsing="false" />
+            <MenuItem fx:id="miRemoveEmptyBoxes" mnemonicParsing="false" onAction="#handleAction" text="Remove Empty Boxes" />
             </items>
         </Menu>
         <Menu fx:id="menuSettings" onAction="#handleAction" text="_Settings">

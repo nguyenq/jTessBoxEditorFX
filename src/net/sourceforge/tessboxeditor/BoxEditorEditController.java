@@ -63,6 +63,8 @@ public class BoxEditorEditController extends BoxEditorController {
     private Button btnMarkEOL;
     @FXML
     private Button btnMarkEOLBulk;
+    @FXML
+    private Button btnRemoveEmptyBoxes;
 
     private OcrSegmentWorker ocrSegmentWorker;
     private OcrSegmentBulkWorker ocrSegmentBulkWorker;
@@ -87,6 +89,8 @@ public class BoxEditorEditController extends BoxEditorController {
             markEOLAction(event);
         } else if (event.getSource() == btnMarkEOLBulk) {
             markEOLActionBulk(event);
+        } else if (event.getSource() == btnRemoveEmptyBoxes) {
+            removeEmptyBoxesAction(event);
         } else {
             super.handleAction(event);
         }
@@ -271,6 +275,11 @@ public class BoxEditorEditController extends BoxEditorController {
 
             progressMonitor.getDialogStage().show();
         }
+    }
+    
+    void removeEmptyBoxesAction(ActionEvent evt) {
+        boxPages.forEach(p -> p.toList().removeIf(b -> b.getCharacter().equals(" ")));
+        loadTable();
     }
 
     /**

@@ -55,3 +55,6 @@ Version 2.4.0 (5 January 2023)
 - Implement Remove empty boxes function
 - Update dependencies
 - Use JavaFX 19
+
+Version 2.4.1 (1 February 2023)
+- Update dependencies

@@ -18,6 +18,7 @@ package net.sourceforge.tessboxeditor;
 import java.awt.Desktop;
 import java.awt.HeadlessException;
 import java.io.IOException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.time.LocalDate;
@@ -189,9 +190,9 @@ public class MainMenuController implements Initializable {
                                 if (domEventType.equals(EVENT_TYPE_CLICK)) {
                                     String href = ((Element) ev.getTarget()).getAttribute("href");
                                     try {
-                                        linkActivated(new URL(href));
+                                        linkActivated(new URI(href).toURL());
                                     } catch (Exception e) {
-
+                                        logger.log(Level.SEVERE, e.getMessage(), e);
                                     }
                                     ev.preventDefault(); // prevent loading into webview; launch external browser only
                                 } else if (domEventType.equals(EVENT_TYPE_MOUSEOVER)) {

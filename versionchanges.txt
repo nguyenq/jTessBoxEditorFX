@@ -62,3 +62,4 @@ Version 2.4.1 (1 February 2023)
 Version 2.5.0 (5 January 2024)
 - Upgrade Tesseract training executable 5.3.3
 - Update tess4j, lept4j, and other dependencies
+- Use JavaFX 21

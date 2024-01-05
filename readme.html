@@ -29,18 +29,22 @@
         <h3>
             SYSTEM REQUIREMENTS</h3>
         <p>
-            <a href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">Java Runtime
-                Environment 8u40</a> or later.
+            <a href="https://www.oracle.com/java/technologies/downloads/">Java 21</a> and <a href="https://gluonhq.com/products/javafx/">JavaFX 21</a>.
         </p>
         <h3>
             INSTRUCTIONS</h3>
         <p>
-            Double-click on the JAR file to launch the program, or execute the following command:
+            Execute the following commands to launch the program:
         </p>
+        Windows:
         <blockquote>
-            <p>
-                <code>java -Xms128m -Xmx1024m -jar jTessBoxEditorFX.jar</code>
-            </p>
+            <code>set PATH_TO_FX="C:\Program Files\Java\javafx-sdk-21.0.1\lib"<br />
+            java -Xms128m -Xmx1024m --module-path %PATH_TO_FX% --add-modules javafx.controls,javafx.fxml,javafx.web -jar jTessBoxEditorFX.jar</code>
+        </blockquote>
+        Linux/Mac:
+        <blockquote>
+            <code>export PATH_TO_FX=path/to/javafx-sdk-21.0.1/lib<br />
+            java -Xms128m -Xmx1024m --module-path $PATH_TO_FX --add-modules javafx.controls,javafx.fxml,javafx.web -jar jTessBoxEditorFX.jar</code>
         </blockquote>
         <p>
             You will need to provide the TIFF/Box files as input to the editor. Images to be

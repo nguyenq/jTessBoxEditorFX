@@ -18,4 +18,6 @@ if [ -z "$JAVACMD" ] ; then
   fi
 fi
 
-$JAVACMD -Xms128m -Xmx1024m -jar "$PROGDIR/$PROGRAM.jar" $@
+export PATH_TO_FX=path/to/javafx-sdk-21.0.1/lib
+
+$JAVACMD -Xms128m -Xmx1024m --module-path $PATH_TO_FX --add-modules javafx.controls,javafx.fxml,javafx.web -jar "$PROGDIR/$PROGRAM.jar" $@

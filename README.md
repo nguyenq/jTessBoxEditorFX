@@ -11,4 +11,4 @@ jTessBoxEditorFX is released and distributed under the [Apache License, v2.0](ht
 ## Features
 
 - Capable of rendering complex scripts
-- Tesseract Windows training executable 5.0.0 bundled
+- Tesseract Windows training executable 5.3.3 bundled

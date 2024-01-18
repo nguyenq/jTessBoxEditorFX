@@ -22,10 +22,12 @@ jTessBoxEditorFX is released and distributed under the [Apache License, v2.0](ht
 Windows:
 
 set PATH_TO_FX="C:\Program Files\Java\javafx-sdk-21.0.1\lib"
+
 java -Xms128m -Xmx1024m --module-path %PATH_TO_FX% --add-modules javafx.controls,javafx.fxml,javafx.web -jar jTessBoxEditorFX.jar
 
 Linux/Mac:
 
 export PATH_TO_FX=path/to/javafx-sdk-21.0.1/lib
+
 java -Xms128m -Xmx1024m --module-path $PATH_TO_FX --add-modules javafx.controls,javafx.fxml,javafx.web -jar jTessBoxEditorFX.jar
 

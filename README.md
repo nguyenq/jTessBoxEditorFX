@@ -11,23 +11,23 @@ jTessBoxEditorFX is released and distributed under the [Apache License, v2.0](ht
 ## Features
 
 - Capable of rendering complex scripts
-- Tesseract Windows training executable 5.3.3 bundled
+- Tesseract Windows training executable 5.5.0 bundled
 
 ## System requirements
 
-[Java 21](https://www.oracle.com/java/technologies/downloads/) and [JavaFX 21](https://gluonhq.com/products/javafx/).
+[Java 24](https://www.oracle.com/java/technologies/downloads/) and [JavaFX 24](https://gluonhq.com/products/javafx/).
 
 ## Command line
 
 Windows:
 
-set PATH_TO_FX="C:\Program Files\Java\javafx-sdk-21.0.1\lib"
+set PATH_TO_FX="C:\Program Files\Java\javafx-sdk-24.0.1\lib"
 
 java -Xms128m -Xmx1024m --module-path %PATH_TO_FX% --add-modules javafx.controls,javafx.fxml,javafx.web,javafx.swing -jar jTessBoxEditorFX.jar
 
 Linux/Mac:
 
-export PATH_TO_FX=path/to/javafx-sdk-21.0.1/lib
+export PATH_TO_FX=path/to/javafx-sdk-24.0.1/lib
 
 java -Xms128m -Xmx1024m --module-path $PATH_TO_FX --add-modules javafx.controls,javafx.fxml,javafx.web,javafx.swing -jar jTessBoxEditorFX.jar
 

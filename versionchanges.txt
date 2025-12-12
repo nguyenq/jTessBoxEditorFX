@@ -72,3 +72,7 @@ Version 2.7.0 (22 June 2025)
 - Upgrade Tesseract training Windows executable 5.5.0
 - Update tess4j, lept4j, and other dependencies
 - Use JavaFX 24
+
+Version 2.7.1 (11 December 2025)
+- Update tess4j, lept4j, jna, and other dependencies
+- Use JavaFX 25
